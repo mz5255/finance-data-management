@@ -3,4 +3,14 @@ spring:
     name: ${application.name:finance-application}
   config:
     import: classpath:datasource.yml
-  port: 8888
+  security:
+    user:
+      name: admin
+      password: 123456
+server:
+  port: 58888
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+

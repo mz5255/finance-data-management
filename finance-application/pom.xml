@@ -22,7 +22,22 @@
     <dependencies>
         <dependency>
             <groupId>cn.com.mz.app.finance.module</groupId>
-            <artifactId>finance-module</artifactId>
+            <artifactId>module-auth</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.mz.app.finance.module</groupId>
+            <artifactId>module-finance</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.mz.app.finance.module</groupId>
+            <artifactId>module-system</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.mz.app.finance.module</groupId>
+            <artifactId>module-user</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
         <dependency>

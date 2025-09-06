@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: ${application.name:finance-application}
+  config:
+    import: classpath:datasource.yml
+  port: 8888

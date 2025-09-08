@@ -1,8 +1,8 @@
 spring:
   application:
-    name: ${application.name:finance-application}
+    name: finance-application
   config:
-    import: classpath:datasource.yml
+    import: classpath:datasource.yml,base.yml,cache.yml
   security:
     user:
       name: admin

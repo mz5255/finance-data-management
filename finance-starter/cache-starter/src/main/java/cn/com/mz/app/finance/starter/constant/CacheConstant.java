@@ -1,7 +1,7 @@
 package cn.com.mz.app.finance.starter.constant;
 
 /**
- * @author Hollis
+ * @author mz
  */
 public class CacheConstant {
 

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 缓存配置
  *
- * @author Hollis
+ * @author mz
  */
 @Configuration
 @EnableMethodCache(basePackages = "cn.com.mz.app.finance")

@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.common;
+package cn.com.mz.app.finance.common.utils;
 
 import com.google.common.collect.Lists;
 

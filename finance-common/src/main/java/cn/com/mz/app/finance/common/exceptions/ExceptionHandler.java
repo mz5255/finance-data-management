@@ -1,6 +1,6 @@
 package cn.com.mz.app.finance.common.exceptions;
 
-import cn.com.mz.app.finance.common.dto.BaseResult;
+import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

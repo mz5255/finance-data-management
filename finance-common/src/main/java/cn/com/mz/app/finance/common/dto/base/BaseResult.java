@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.common.dto;
+package cn.com.mz.app.finance.common.dto.base;
 
 import lombok.Data;
 import org.jboss.logging.MDC;
@@ -31,6 +31,10 @@ public class BaseResult<T> {
 
     public static <T> BaseResult<T> error(int code, String msg) {
         return new BaseResult<>(code, msg);
+    }
+
+    public boolean isSuccess() {
+        return this.code == 200;
     }
 
     public BaseResult(int code, String message, T data) {

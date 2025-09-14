@@ -21,7 +21,6 @@ public class SwaggerRedirectFilter implements Filter {
             httpResponse.sendRedirect("/swagger-ui.html");
             return;
         }
-        
         chain.doFilter(request, response);
     }
 }

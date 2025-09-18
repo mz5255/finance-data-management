@@ -7,6 +7,7 @@
     <groupId>cn.com.mz.app</groupId>
     <artifactId>finance-data-mangement</artifactId>
     <version>1.0-RELEASE</version>
+    <name>finance-data-mangement</name>
     <packaging>pom</packaging>
     <modules>
         <module>finance-module</module>
@@ -55,14 +56,14 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- SpringDoc OpenAPI (Swagger) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.1.0</version>
         </dependency>
-        
+
         <!-- Netty DNS resolver for macOS -->
         <dependency>
             <groupId>io.netty</groupId>

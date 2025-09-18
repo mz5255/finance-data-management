@@ -2,7 +2,7 @@ spring:
   application:
     name: finance-application
   config:
-    import: classpath:datasource.yml,base.yml,cache.yml
+    import: classpath:datasource.yml,base.yml,cache.yml,auth.yml
   security:
     user:
       name: admin

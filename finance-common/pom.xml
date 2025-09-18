@@ -2,15 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <artifactId>finance-common</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.com.mz.app</groupId>
         <artifactId>finance-data-mangement</artifactId>
         <version>1.0-RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <groupId>cn.com.mz.app.finance.common</groupId>
-    <artifactId>finance-common</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

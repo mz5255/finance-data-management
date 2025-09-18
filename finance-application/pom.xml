@@ -9,7 +9,6 @@
         <version>1.0-RELEASE</version>
     </parent>
 
-    <groupId>cn.com.mz.app.finance.application</groupId>
     <artifactId>finance-application</artifactId>
 
     <properties>
@@ -21,22 +20,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.com.mz.app.finance.module</groupId>
+            <groupId>cn.com.mz.app</groupId>
             <artifactId>module-auth</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>cn.com.mz.app.finance.module</groupId>
+            <groupId>cn.com.mz.app</groupId>
             <artifactId>module-finance</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>cn.com.mz.app.finance.module</groupId>
+            <groupId>cn.com.mz.app</groupId>
             <artifactId>module-system</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>cn.com.mz.app.finance.module</groupId>
+            <groupId>cn.com.mz.app</groupId>
             <artifactId>module-user</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>

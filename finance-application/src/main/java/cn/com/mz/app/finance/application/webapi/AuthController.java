@@ -11,6 +11,8 @@ import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +34,7 @@ import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_P
  */
 @RestController
 @RequestMapping("/api/finance-data/auth")
+@Tag(name = "权限模块", description = "用户登录注册相关接口")
 public class AuthController {
 
     @Resource
@@ -47,6 +50,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
+    @Operation(summary = "注册", description = "用户注册")
     public BaseResult<Boolean> register(@Valid @RequestBody RegisterParam registerParam) {
         //验证码校验
         String cachedCode = redisTemplate.opsForValue().get(CAPTCHA_KEY_PREFIX + registerParam.getTelephone());
@@ -72,6 +76,7 @@ public class AuthController {
      * @return 结果
      */
     @PostMapping("/login")
+    @Operation(summary = "登录")
     public BaseResult<LoginReq> login(@Valid @RequestBody LoginParam loginParam) {
         //fixme 为了方便，暂时直接跳过
         if (!ROOT_CAPTCHA.equals(loginParam.getCaptcha())) {
@@ -119,13 +124,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/logout")
+    @Operation(summary = "登出")
     public BaseResult<Boolean> logout() {
         StpUtil.logout();
         return BaseResult.success(true);
-    }
-
-    @RequestMapping("test")
-    public String test() {
-        return "test";
     }
 }

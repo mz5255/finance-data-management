@@ -9,11 +9,12 @@
         <version>1.0-RELEASE</version>
     </parent>
 
-    <groupId>cn.com.mz.app.finance.starter</groupId>
     <artifactId>finance-starter</artifactId>
     <packaging>pom</packaging>
+    <name>finance-starter</name>
     <modules>
         <module>cache-starter</module>
+        <module>sa-token-starter</module>
     </modules>
 
     <properties>
@@ -24,7 +25,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.com.mz.app.finance.common</groupId>
+            <groupId>cn.com.mz.app</groupId>
             <artifactId>finance-common</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>

@@ -1,9 +1,9 @@
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/finance-data?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/finance_data?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
     username: root
-    password: mazhen5255
+    password: 305255
     driver-class-name: com.mysql.cj.jdbc.Driver
     druid:
       initial-size: 5        # 初始连接池大小
@@ -20,7 +20,7 @@ spring:
 
   mybatis-plus:
     mapper-locations: classpath:/mappers/**/*.xml
-    type-aliases-package: com.yourproject.model  # 配置实体类所在包
+    type-aliases-package: cn.com.mz.app.finance.datasource.entity  # 配置实体类所在包
     global-config:
       db-config:
         id-type: auto      # 主键生成策略

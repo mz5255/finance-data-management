@@ -9,7 +9,6 @@
         <version>1.0-RELEASE</version>
     </parent>
 
-    <groupId>cn.com.mz.app.finance.module</groupId>
     <artifactId>finance-module</artifactId>
     <packaging>pom</packaging>
     <modules>
@@ -29,6 +28,11 @@
         <dependency>
             <groupId>cn.com.mz.app</groupId>
             <artifactId>finance-datasource</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.com.mz.app</groupId>
+            <artifactId>cache-starter</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
     </dependencies>

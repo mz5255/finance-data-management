@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <artifactId>cache-starter</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.com.mz.app.finance.starter</groupId>
+        <groupId>cn.com.mz.app</groupId>
         <artifactId>finance-starter</artifactId>
         <version>1.0-RELEASE</version>
     </parent>
 
-    <artifactId>cache-starter</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -18,17 +18,37 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Data Redis 依赖 -->
+        <!--     Redis  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <!-- Redis 客户端 (Jedis) -->
+        <!--    Redisson    -->
         <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>3.6.3</version> <!-- 适当版本 -->
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.24.3</version>
+        </dependency>
+
+        <!--    Caffeine    -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version>
+        </dependency>
+
+        <!--    JetCache    -->
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-starter-redisson</artifactId>
+            <version>2.7.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

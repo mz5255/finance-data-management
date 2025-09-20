@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.entity.base;
+package cn.com.mz.app.finance.datasource.mysql.entity.base;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;

@@ -1,5 +1,8 @@
 package cn.com.mz.app.finance.module.service.auth;
 
+import cn.com.mz.app.finance.common.dto.base.BaseResult;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 
 /**
@@ -15,5 +18,10 @@ public interface AuthService {
      * @param userRegisterRequest
      * @return
      */
-    UserOperatorResponse register(UserRegisterRequest userRegisterRequest);
+    BaseResult<?> register(UserRegisterRequest userRegisterRequest);
+
+    /**
+     * 用户登录
+     */
+    BaseResult<UserInfo> query(UserQueryRequest userQueryRequest);
 }

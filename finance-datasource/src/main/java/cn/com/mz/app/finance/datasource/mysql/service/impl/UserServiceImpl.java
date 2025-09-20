@@ -1,12 +1,15 @@
-package cn.com.mz.app.finance.datasource.service;
+package cn.com.mz.app.finance.datasource.mysql.service.impl;
 
-import cn.com.mz.app.finance.datasource.entity.user.UserDO;
-import cn.com.mz.app.finance.datasource.entity.user.enums.UserRole;
-import cn.com.mz.app.finance.datasource.entity.user.enums.UserStateEnum;
-import cn.com.mz.app.finance.datasource.mapper.UserMapper;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
+import cn.com.mz.app.finance.datasource.mysql.mapper.UserMapper;
+import cn.com.mz.app.finance.datasource.mysql.service.UserService;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,9 +21,9 @@ import java.util.List;
  * @author mz
  */
 @Service
-public class UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
     /**
@@ -29,20 +32,16 @@ public class UserService {
      * @param telephone 手机号
      * @return 用户信息
      */
+    @Override
     public UserDO getByTelephone(String telephone) {
         return userMapper.selectOne(new LambdaQueryWrapper<UserDO>()
                 .eq(UserDO::getTelephone, telephone));
     }
 
-    /**
-     * 根据邀请码查询用户
-     *
-     * @param inviteCode 邀请码
-     * @return 用户信息
-     */
-    public UserDO getByInviteCode(String inviteCode) {
+    @Override
+    public UserDO getByNikeName(String nikeName) {
         return userMapper.selectOne(new LambdaQueryWrapper<UserDO>()
-                .eq(UserDO::getInviteCode, inviteCode));
+                .eq(UserDO::getNickName, nikeName));
     }
 
     /**
@@ -51,6 +50,7 @@ public class UserService {
      * @param state 用户状态
      * @return 用户列表
      */
+    @Override
     public List<UserDO> getByState(UserStateEnum state) {
         return userMapper.selectList(new LambdaQueryWrapper<UserDO>()
                 .eq(UserDO::getState, state));
@@ -62,20 +62,29 @@ public class UserService {
      * @param userRole 用户角色
      * @return 用户列表
      */
+    @Override
     public List<UserDO> getByUserRole(UserRole userRole) {
         return userMapper.selectList(new LambdaQueryWrapper<UserDO>()
                 .eq(UserDO::getUserRole, userRole));
     }
 
     /**
-     * 根据邀请人ID查询被邀请用户列表
+     * 根据账号密码查询本人
      *
-     * @param inviterId 邀请人ID
+     * @param phone 邀请人ID
      * @return 被邀请用户列表
      */
-    public List<UserDO> getByInviterId(String inviterId) {
-        return userMapper.selectList(new LambdaQueryWrapper<UserDO>()
-                .eq(UserDO::getInviterId, inviterId));
+    @Override
+    public UserDO getByPhoneAndPass(String phone,String password) {
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
+        UserDO byTelephone = getByTelephone(phone);
+        if (byTelephone == null) {
+            return null;
+        }
+        String salt = byTelephone.getSalt();
+        wrapper.eq(UserDO::getTelephone, phone);
+        wrapper.eq(UserDO::getPasswordHash, DigestUtil.md5Hex(password+salt));
+        return userMapper.selectOne(wrapper);
     }
 
     /**
@@ -85,6 +94,7 @@ public class UserService {
      * @param state 新状态
      * @return 是否更新成功
      */
+    @Override
     public boolean updateStateById(Long id, UserStateEnum state) {
         return userMapper.update(null, new LambdaUpdateWrapper<UserDO>()
                 .eq(UserDO::getId, id)
@@ -97,6 +107,7 @@ public class UserService {
      * @param id 用户ID
      * @return 是否更新成功
      */
+    @Override
     public boolean updateLastLoginTime(Long id) {
         return userMapper.update(null, new LambdaUpdateWrapper<UserDO>()
                 .eq(UserDO::getId, id)
@@ -108,6 +119,7 @@ public class UserService {
      *
      * @return 用户总数
      */
+    @Override
     public Long countUsers() {
         return userMapper.selectCount(new LambdaQueryWrapper<UserDO>());
     }
@@ -117,6 +129,7 @@ public class UserService {
      *
      * @return 已认证用户数
      */
+    @Override
     public Long countCertifiedUsers() {
         return userMapper.selectCount(new LambdaQueryWrapper<UserDO>()
                 .eq(UserDO::getCertification, true));
@@ -128,6 +141,7 @@ public class UserService {
      * @param user 用户信息
      * @return 是否保存成功
      */
+    @Override
     public boolean save(UserDO user) {
         return userMapper.insert(user) > 0;
     }
@@ -138,6 +152,7 @@ public class UserService {
      * @param user 用户信息
      * @return 是否更新成功
      */
+    @Override
     public boolean updateById(UserDO user) {
         return userMapper.updateById(user) > 0;
     }
@@ -148,6 +163,7 @@ public class UserService {
      * @param id 用户ID
      * @return 用户信息
      */
+    @Override
     public UserDO getById(Long id) {
         return userMapper.selectById(id);
     }
@@ -158,6 +174,7 @@ public class UserService {
      * @param id 用户ID
      * @return 是否删除成功
      */
+    @Override
     public boolean deleteById(Long id) {
         return userMapper.deleteById(id) > 0;
     }

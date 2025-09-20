@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.entity.user.enums;
+package cn.com.mz.app.finance.datasource.mysql.entity.user.enums;
 
 /**
  * @author Hollis

@@ -1,9 +1,9 @@
-package cn.com.mz.app.finance.datasource.entity.user;
+package cn.com.mz.app.finance.datasource.mysql.entity.user;
 
-import cn.com.mz.app.finance.datasource.entity.base.BaseEntity;
-import cn.com.mz.app.finance.datasource.entity.handler.AesEncryptTypeHandler;
-import cn.com.mz.app.finance.datasource.entity.user.enums.UserRole;
-import cn.com.mz.app.finance.datasource.entity.user.enums.UserStateEnum;
+import cn.com.mz.app.finance.datasource.mysql.entity.base.BaseEntity;
+import cn.com.mz.app.finance.datasource.mysql.entity.handler.AesEncryptTypeHandler;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -11,6 +11,7 @@ import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * 用户
@@ -34,16 +35,6 @@ public class UserDO extends BaseEntity {
      * 状态
      */
     private UserStateEnum state;
-
-    /**
-     * 邀请码
-     */
-    private String inviteCode;
-
-    /**
-     * 邀请人用户ID
-     */
-    private String inviterId;
 
     /**
      * 手机号
@@ -89,18 +80,22 @@ public class UserDO extends BaseEntity {
     private String idCardNo;
 
     /**
+     * 密码盐
+     */
+    private String salt;
+
+    /**
      * 用户角色
      */
     private UserRole userRole;
 
-    public UserDO register(String telephone, String nickName, String password,String inviteCode,String inviterId) {
+    public UserDO register(String telephone, String nickName, String password) {
         this.telephone = telephone;
         this.nickName = nickName;
-        this.passwordHash = DigestUtil.md5Hex(password);
+        this.salt = UUID.randomUUID().toString().substring(0,4);
+        this.passwordHash = DigestUtil.md5Hex(password+this,salt);
         this.state = UserStateEnum.INIT;
         this.userRole = UserRole.CUSTOMER;
-        this.inviteCode = inviteCode;
-        this.inviterId = inviterId;
         return this;
     }
 
@@ -108,7 +103,6 @@ public class UserDO extends BaseEntity {
         this.telephone = telephone;
         this.nickName = nickName;
         this.passwordHash = DigestUtil.md5Hex(password);
-        this.state = UserStateEnum.ACTIVE;
         this.userRole = UserRole.ADMIN;
         return this;
     }
@@ -124,11 +118,10 @@ public class UserDO extends BaseEntity {
     public UserDO active(String blockChainUrl, String blockChainPlatform) {
         this.blockChainPlatform = blockChainPlatform;
         this.blockChainUrl = blockChainUrl;
-        this.state = UserStateEnum.ACTIVE;
         return this;
     }
 
     public boolean canModifyInfo() {
-        return state == UserStateEnum.INIT || state == UserStateEnum.AUTH || state == UserStateEnum.ACTIVE;
+        return state == UserStateEnum.INIT || state == UserStateEnum.AUTH;
     }
 }

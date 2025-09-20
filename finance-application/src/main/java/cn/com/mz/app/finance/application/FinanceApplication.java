@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "cn.com.mz.app.finance")
-@MapperScan("cn.com.mz.app.finance.datasource.mapper")
+@MapperScan("cn.com.mz.app.finance.datasource.mysql.mapper")
 public class FinanceApplication {
     public static void main(String[] args) {
         SpringApplication.run(FinanceApplication.class,args);

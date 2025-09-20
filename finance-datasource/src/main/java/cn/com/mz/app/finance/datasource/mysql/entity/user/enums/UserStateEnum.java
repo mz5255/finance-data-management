@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.entity.user.enums;
+package cn.com.mz.app.finance.datasource.mysql.entity.user.enums;
 
 /**
  * 用户状态
@@ -14,10 +14,6 @@ public enum UserStateEnum {
      * 实名认证
      */
     AUTH,
-    /**
-     * 上链成功
-     */
-    ACTIVE,
 
     /**
      * 冻结

@@ -19,6 +19,8 @@
     </properties>
 
     <dependencies>
+
+
         <!--    Mybatis    -->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -57,6 +59,11 @@
             <groupId>cn.com.mz.app</groupId>
             <artifactId>finance-common</artifactId>
             <version>1.0-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
         </dependency>
 
     </dependencies>

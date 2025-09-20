@@ -1,7 +1,7 @@
 package cn.com.mz.app.finance.module.service.auth;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
-import cn.com.mz.app.finance.datasource.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import lombok.Getter;
 import lombok.Setter;
 

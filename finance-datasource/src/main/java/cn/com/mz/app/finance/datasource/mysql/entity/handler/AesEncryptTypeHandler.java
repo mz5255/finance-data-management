@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.entity.handler;
+package cn.com.mz.app.finance.datasource.mysql.entity.handler;
 
 import cn.com.mz.app.finance.common.utils.AesUtil;
 import org.apache.ibatis.type.BaseTypeHandler;

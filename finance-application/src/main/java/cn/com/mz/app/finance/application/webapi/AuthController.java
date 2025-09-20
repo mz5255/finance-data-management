@@ -61,7 +61,6 @@ public class AuthController {
         //注册
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
         userRegisterRequest.setTelephone(registerParam.getTelephone());
-        userRegisterRequest.setInviteCode(registerParam.getInviteCode());
 
         BaseResult<?> registerResult = authService.register(userRegisterRequest);
         if(registerResult.isSuccess()){

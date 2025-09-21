@@ -1,5 +1,6 @@
 package cn.com.mz.app.finance.application.webapi;
 
+import cn.com.mz.app.finance.common.aspect.mobile.IsMobile;
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
@@ -17,10 +18,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_PREFIX;
 
@@ -48,6 +46,12 @@ public class AuthController {
      */
     private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
 
+
+    @GetMapping("/sendCaptcha")
+    public BaseResult<Boolean> sendCaptcha(@IsMobile String telephone) {
+        NoticeResponse noticeResponse = noticeFacadeService.generateAndSendSmsCaptcha(telephone);
+        return BaseResult.success(noticeResponse.getSuccess());
+    }
 
     @PostMapping("/register")
     @Operation(summary = "注册", description = "用户注册")

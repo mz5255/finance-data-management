@@ -5,18 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.com.mz.app</groupId>
-        <artifactId>finance-data-mangement</artifactId>
+        <artifactId>finance-starter</artifactId>
         <version>1.0-RELEASE</version>
     </parent>
 
-    <artifactId>finance-starter</artifactId>
-    <packaging>pom</packaging>
-    <name>finance-starter</name>
-    <modules>
-        <module>cache-starter</module>
-        <module>sa-token-starter</module>
-        <module>sms-starter</module>
-    </modules>
+    <artifactId>sms-starter</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -27,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>cn.com.mz.app</groupId>
-            <artifactId>finance-common</artifactId>
+            <artifactId>cache-starter</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
     </dependencies>

@@ -1,7 +1,6 @@
 package cn.com.mz.app.finance.common.dto.base;
 
 import lombok.Data;
-import org.jboss.logging.MDC;
 
 /**
  * @author mz
@@ -41,26 +40,22 @@ public class BaseResult<T> {
         this.code = code;
         this.message = message;
         this.data = data;
-        this.traceId = MDC.get("traceId").toString();
     }
 
     public BaseResult(T data) {
         this.code = 200;
         this.message = "success";
         this.data = data;
-        this.traceId = MDC.get("traceId").toString();
     }
 
     public BaseResult() {
         this.code = 200;
         this.message = "success";
         this.data = null;
-        this.traceId = MDC.get("traceId").toString();
     }
 
     public BaseResult(int code, String message) {
         this.code = code;
         this.message = message;
-        this.traceId = MDC.get("traceId").toString();
     }
 }

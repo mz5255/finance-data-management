@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.common.aspect.log;
+package log;
 /**
  * @author mz
  */

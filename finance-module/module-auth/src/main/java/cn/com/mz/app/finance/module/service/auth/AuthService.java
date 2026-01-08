@@ -24,4 +24,7 @@ public interface AuthService {
      * 用户登录
      */
     BaseResult<UserInfo> query(UserQueryRequest userQueryRequest);
+
+
+    void captchaImage(String telephone);
 }

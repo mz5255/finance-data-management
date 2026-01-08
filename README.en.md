@@ -25,3 +25,7 @@ port  8888
 1.  xxxx
 2.  xxxx
 3.  xxxx
+
+4.依赖关系
+application -> module -> starter
+                      -> datasource -> common      

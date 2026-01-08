@@ -10,6 +10,7 @@ import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
+import cn.com.mz.app.finance.starter.utils.RedisUtils;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_PREFIX;
@@ -36,7 +36,7 @@ import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_P
 public class AuthController {
 
     @Resource
-    private StringRedisTemplate redisTemplate;
+    private RedisUtils redisUtils;
     @Resource
     private AuthService authService;
 
@@ -47,17 +47,16 @@ public class AuthController {
     private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
 
 
-    @GetMapping("/sendCaptcha")
-    public BaseResult<Boolean> sendCaptcha(@IsMobile String telephone) {
-        NoticeResponse noticeResponse = noticeFacadeService.generateAndSendSmsCaptcha(telephone);
-        return BaseResult.success(noticeResponse.getSuccess());
+    @GetMapping("/captchaImage")
+    public void captchaImage(@IsMobile String telephone) {
+        authService.captchaImage(telephone);
     }
 
     @PostMapping("/register")
     @Operation(summary = "注册", description = "用户注册")
     public BaseResult<Boolean> register(@Valid @RequestBody RegisterParam registerParam) {
         //验证码校验
-        String cachedCode = redisTemplate.opsForValue().get(CAPTCHA_KEY_PREFIX + registerParam.getTelephone());
+        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + registerParam.getTelephone());
         if (!StringUtils.equalsIgnoreCase(cachedCode, registerParam.getCaptcha())) {
             throw new BusinessException("验证码错误");
         }
@@ -81,13 +80,10 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "登录")
     public BaseResult<LoginReq> login(@Valid @RequestBody LoginParam loginParam) {
-        //fixme 为了方便，暂时直接跳过
-        if (!ROOT_CAPTCHA.equals(loginParam.getCaptcha())) {
-            //验证码校验
-            String cachedCode = redisTemplate.opsForValue().get(CAPTCHA_KEY_PREFIX + loginParam.getTelephone());
-            if (!StringUtils.equalsIgnoreCase(cachedCode, loginParam.getCaptcha())) {
-                throw new BusinessException("验证码错误");
-            }
+        //验证码校验
+        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + loginParam.getTelephone());
+        if (!StringUtils.equalsIgnoreCase(cachedCode, loginParam.getCaptcha())) {
+            throw new BusinessException("验证码错误");
         }
 
         //判断是注册还是登陆

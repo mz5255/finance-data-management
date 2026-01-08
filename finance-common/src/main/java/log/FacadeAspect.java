@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.common.aspect.log;
+package log;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.enums.ResponseCode;

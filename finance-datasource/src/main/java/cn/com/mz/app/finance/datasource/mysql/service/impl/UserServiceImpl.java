@@ -3,7 +3,7 @@ package cn.com.mz.app.finance.datasource.mysql.service.impl;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
-import cn.com.mz.app.finance.datasource.mysql.mapper.UserMapper;
+import cn.com.mz.app.finance.datasource.mysql.mapper.SysUserRoleMapper;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -21,10 +21,10 @@ import java.util.List;
  * @author mz
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
+public class UserServiceImpl extends ServiceImpl<SysUserRoleMapper, UserDO> implements UserService {
 
     @Resource
-    private UserMapper userMapper;
+    private SysUserRoleMapper userMapper;
 
     /**
      * 根据手机号查询用户

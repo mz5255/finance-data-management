@@ -6,14 +6,18 @@ import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
+import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.dto.req.condition.UserIdQueryCondition;
 import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneAndPasswordQueryCondition;
 import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneQueryCondition;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
+import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.com.mz.app.finance.starter.lock.DistributeLock;
 import cn.com.mz.app.finance.starter.utils.RedisUtils;
+import cn.dev33.satoken.stp.SaLoginModel;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.Cache;
@@ -55,6 +59,12 @@ public class AuthServiceImpl implements AuthService {
     private HttpServletResponse response;
     @Resource
     private RedisUtils redisUtils;
+
+    private static final String ROOT_CAPTCHA = "5255";
+    /**
+     * 默认登录超时时间：7天
+     */
+    private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
     /**
      * 用户名布隆过滤器
      */
@@ -229,5 +239,61 @@ public class AuthServiceImpl implements AuthService {
     }
     private void updateUserCache(String userId, UserDO user) {
         idUserCache.put(userId, user);
+    }
+
+    /**
+     * 登录
+     * @param loginParam
+     * @return
+     */
+    @Transactional
+    public BaseResult<LoginReq> login(LoginParam loginParam) {
+        //验证码校验
+        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + loginParam.getTelephone());
+        if (!StringUtils.equalsIgnoreCase(cachedCode, loginParam.getCaptcha())) {
+            throw new BusinessException("验证码错误");
+        }
+
+        //判断是注册还是登陆
+        //查询用户信息
+        UserQueryRequest userQueryRequest = new UserQueryRequest(loginParam.getTelephone());
+        BaseResult<UserInfo> userQueryResponse = query(userQueryRequest);
+        UserInfo userInfo = userQueryResponse.getData();
+        if (userInfo == null) {
+            //需要注册
+            UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+            userRegisterRequest.setTelephone(loginParam.getTelephone());
+
+            BaseResult<?> response = register(userRegisterRequest);
+            if (response.isSuccess()) {
+                userQueryResponse = query(userQueryRequest);
+                userInfo = userQueryResponse.getData();
+                LoginReq loginVO = getLoginReq(loginParam, userInfo);
+                return BaseResult.success(loginVO);
+            }
+            return BaseResult.error(response.getCode(), response.getMessage());
+        } else {
+            //登录
+            LoginReq loginVO = getLoginReq(loginParam, userInfo);
+            return BaseResult.success(loginVO);
+        }
+    }
+
+    /**
+     *  填充用户信息至上下文中 & 更新用户最后一次登录时间
+     * @param loginParam
+     * @param userInfo
+     * @return
+     */
+    @Transactional
+    public LoginReq getLoginReq(LoginParam loginParam, UserInfo userInfo) {
+        StpUtil.login(userInfo.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
+                .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
+        StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
+        LoginReq loginVO = new LoginReq(userInfo);
+        UserDO userDO = UserConvertor.INSTANCE.mapToEntity(userInfo);
+        userDO.login();
+        userService.updateById(userDO);
+        return loginVO;
     }
 }

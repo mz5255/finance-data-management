@@ -2,7 +2,9 @@ package cn.com.mz.app.finance.module.service.auth;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
+import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 
 /**
@@ -27,4 +29,6 @@ public interface AuthService {
 
 
     void captchaImage(String telephone);
+
+    BaseResult<LoginReq> login(LoginParam loginParam);
 }

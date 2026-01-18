@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.mz.app.finance.datasource.mysql.mapper.SysMenuMapper">
+
+    <select id="selectMenuPermsByUserId" resultType="java.lang.String">
+        SELECT DISTINCT m.perms
+        FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+        WHERE ur.user_id = #{userId} 
+          AND m.status = '0' 
+          AND m.perms IS NOT NULL 
+          AND m.perms != ''
+    </select>
+
+    <select id="selectMenuPermsByRoleId" resultType="java.lang.String">
+        SELECT DISTINCT m.perms
+        FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        WHERE rm.role_id = #{roleId} 
+          AND m.status = '0' 
+          AND m.perms IS NOT NULL 
+          AND m.perms != ''
+    </select>
+
+    <select id="selectMenuTreeByUserId" resultType="cn.com.mz.app.finance.datasource.mysql.entity.permission.SysMenuDO">
+        SELECT DISTINCT m.menu_id, m.menu_name, m.parent_id, m.order_num, m.path,
+               m.component, m.query, m.is_frame, m.is_cache, m.menu_type,
+               m.visible, m.status, m.perms, m.icon, m.create_by, m.create_time,
+               m.update_by, m.update_time, m.remark
+        FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+        WHERE ur.user_id = #{userId} 
+          AND m.status = '0' 
+          AND m.menu_type IN ('M', 'C')
+        ORDER BY m.parent_id, m.order_num
+    </select>
+
+    <select id="selectMenuListByRoleId" resultType="java.lang.Long">
+        SELECT m.menu_id
+        FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        WHERE rm.role_id = #{roleId}
+    </select>
+
+</mapper>

@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.application.webapi;
+package cn.com.mz.app.finance.application.webapi.system.user;
 
 import cn.com.mz.app.finance.common.aspect.mobile.IsMobile;
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
@@ -40,12 +40,6 @@ public class AuthController {
     @Resource
     private AuthService authService;
 
-    private static final String ROOT_CAPTCHA = "5255";
-    /**
-     * 默认登录超时时间：7天
-     */
-    private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
-
 
     @GetMapping("/captchaImage")
     public void captchaImage(@IsMobile String telephone) {
@@ -80,43 +74,10 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "登录")
     public BaseResult<LoginReq> login(@Valid @RequestBody LoginParam loginParam) {
-        //验证码校验
-        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + loginParam.getTelephone());
-        if (!StringUtils.equalsIgnoreCase(cachedCode, loginParam.getCaptcha())) {
-            throw new BusinessException("验证码错误");
-        }
-
-        //判断是注册还是登陆
-        //查询用户信息
-        UserQueryRequest userQueryRequest = new UserQueryRequest(loginParam.getTelephone());
-        BaseResult<UserInfo> userQueryResponse = authService.query(userQueryRequest);
-        UserInfo userInfo = userQueryResponse.getData();
-        if (userInfo == null) {
-            //需要注册
-            UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-            userRegisterRequest.setTelephone(loginParam.getTelephone());
-
-            BaseResult<?> response = authService.register(userRegisterRequest);
-            if (response.isSuccess()) {
-                userQueryResponse = authService.query(userQueryRequest);
-                userInfo = userQueryResponse.getData();
-                StpUtil.login(userInfo.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
-                        .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
-                StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
-                LoginReq loginVO = new LoginReq(userInfo);
-                return BaseResult.success(loginVO);
-            }
-
-            return BaseResult.error(response.getCode(), response.getMessage());
-        } else {
-            //登录
-            StpUtil.login(userInfo.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
-                    .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
-            StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
-            LoginReq loginVO = new LoginReq(userInfo);
-            return BaseResult.success(loginVO);
-        }
+        return authService.login(loginParam);
     }
+
+
 
     /**
      * 登出方法

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
 
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class UserDO extends BaseEntity {
     /**
      * 最后登录时间
      */
-    private Date lastLoginTime;
+    private LocalTime lastLoginTime;
 
     /**
      * 头像地址
@@ -118,6 +119,11 @@ public class UserDO extends BaseEntity {
     public UserDO active(String blockChainUrl, String blockChainPlatform) {
         this.blockChainPlatform = blockChainPlatform;
         this.blockChainUrl = blockChainUrl;
+        return this;
+    }
+
+    public UserDO login(){
+        this.lastLoginTime = LocalTime.now();
         return this;
     }
 

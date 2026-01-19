@@ -1,9 +1,11 @@
-package cn.com.mz.app.finance.datasource.mysql.mapper;
+package cn.com.mz.app.finance.datasource.mysql.mapper.user;
 
-import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysUserRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 用户角色关联Mapper
@@ -11,7 +13,7 @@ import org.apache.ibatis.annotations.Param;
  * @author mz
  */
 @Mapper
-public interface SysUserRoleMapper extends BaseMapper<UserDO> {
+public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
 
     /**
      * 删除用户角色关联
@@ -28,5 +30,5 @@ public interface SysUserRoleMapper extends BaseMapper<UserDO> {
      * @param roleIds 角色ID列表
      * @return 影响行数
      */
-    int batchInsert(@Param("userId") String userId, @Param("roleIds") java.util.List<Long> roleIds);
+    int batchInsert(@Param("userId") String userId, @Param("roleIds") List<Long> roleIds);
 }

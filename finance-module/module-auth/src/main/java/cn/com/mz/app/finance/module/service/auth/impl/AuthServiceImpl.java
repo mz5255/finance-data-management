@@ -58,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private HttpServletResponse response;
     @Resource
+
     private RedisUtils redisUtils;
 
     private static final String ROOT_CAPTCHA = "5255";
@@ -108,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
         Assert.notNull(user, "用户注册失败");
 
         addNickName(defaultNickName);
-        updateUserCache(user.getId().toString(), user);
+        updateUserCache(user.getId(), user);
 
         return BaseResult.success(user);
     }

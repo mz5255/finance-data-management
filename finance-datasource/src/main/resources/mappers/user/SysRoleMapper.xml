@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.com.mz.app.finance.datasource.mysql.mapper.SysRoleMapper">
+<mapper namespace="cn.com.mz.app.finance.datasource.mysql.mapper.user.SysRoleMapper">
 
     <select id="selectRolesByUserId" resultType="cn.com.mz.app.finance.datasource.mysql.entity.permission.SysRoleDO">
-        SELECT r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, 
+        SELECT r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope,
                r.menu_check_strictly, r.dept_check_strictly, r.status, r.del_flag,
                r.create_by, r.create_time, r.update_by, r.update_time, r.remark
         FROM sys_role r

@@ -21,7 +21,7 @@ public class BasicUserInfo implements Serializable {
     /**
      * 用户Id
      */
-    private Long userId;
+    private String userId;
 
     /**
      * 昵称

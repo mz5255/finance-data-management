@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.mysql.mapper;
+package cn.com.mz.app.finance.datasource.mysql.mapper.user;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysRoleDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

@@ -3,7 +3,7 @@ package cn.com.mz.app.finance.datasource.mysql.service.impl;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
-import cn.com.mz.app.finance.datasource.mysql.mapper.SysUserRoleMapper;
+import cn.com.mz.app.finance.datasource.mysql.mapper.user.SysUserRoleMapper;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

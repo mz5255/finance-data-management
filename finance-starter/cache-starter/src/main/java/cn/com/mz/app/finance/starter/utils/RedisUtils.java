@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,10 +43,18 @@ public class RedisUtils {
             redisTemplate.expire(key, timeout, timeUnit);
         }
     }
+    public void expire(String key, Duration duration){
+        redisTemplate.expire(key, duration);
+    }
+
     public long getExpire(String key) {
         return redisTemplate.getExpire(key);
     }
     public Boolean setIfAbsent(String key, String value) {
        return redisTemplate.opsForValue().setIfAbsent(key, value);
+    }
+
+    public Long incr(String key){
+      return redisTemplate.opsForValue().increment(key);
     }
 }

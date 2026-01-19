@@ -1,4 +1,4 @@
-package cn.com.mz.app.finance.datasource.mysql.mapper;
+package cn.com.mz.app.finance.datasource.mysql.mapper.user;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;

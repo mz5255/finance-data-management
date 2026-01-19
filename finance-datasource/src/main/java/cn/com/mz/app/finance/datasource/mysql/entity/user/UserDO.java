@@ -11,7 +11,6 @@ import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
 
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -91,6 +90,7 @@ public class UserDO extends BaseEntity {
     private UserRole userRole;
 
     public UserDO register(String telephone, String nickName, String password) {
+        this.setId();
         this.telephone = telephone;
         this.nickName = nickName;
         this.salt = UUID.randomUUID().toString().substring(0,4);
@@ -122,9 +122,8 @@ public class UserDO extends BaseEntity {
         return this;
     }
 
-    public UserDO login(){
+    public void login(){
         this.lastLoginTime = LocalTime.now();
-        return this;
     }
 
     public boolean canModifyInfo() {

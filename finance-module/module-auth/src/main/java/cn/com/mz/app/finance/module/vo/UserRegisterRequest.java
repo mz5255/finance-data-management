@@ -32,4 +32,19 @@ public class UserRegisterRequest extends BaseReq {
      */
     private String password;
 
+    /**
+     *昵称
+     */
+    private String nickName;
+
+    /**
+     * 头像
+     */
+    private String profilePhotoUrl;
+
+    /**
+     * 性别
+     */
+    private String gender;
+
 }

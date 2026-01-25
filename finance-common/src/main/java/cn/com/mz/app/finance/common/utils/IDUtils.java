@@ -1,5 +1,6 @@
 package cn.com.mz.app.finance.common.utils;
 
+import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +43,7 @@ public class IDUtils {
      * @param mobile 11位有效手机号
      * @return 全局唯一ID（Long类型，便于存储和计算，长度约18位）
      */
-    public static long generateUniqueId(String mobile) {
+    public static Long generateUniqueId(String mobile) {
         // 1. 参数校验
         if (mobile == null || !mobile.matches("^1[3-9]\\d{9}$")) {
             throw new IllegalArgumentException("手机号格式不正确，必须是11位有效手机号");
@@ -76,7 +77,7 @@ public class IDUtils {
      * @param uniqueId 生成的全局唯一ID
      * @return 库索引（0-15）
      */
-    public static int getDbIndex(long uniqueId) {
+    public static int getDbIndex(Long uniqueId) {
         // 从ID中提取手机号哈希值（还原分片基础）
         long mobileHash = (uniqueId >> 40) & 0xFFFFFFFFFFFFL;
         // 取模16，得到库索引
@@ -88,7 +89,7 @@ public class IDUtils {
      * @param uniqueId 生成的全局唯一ID
      * @return 表索引（0-511）
      */
-    public static int getTableIndex(long uniqueId) {
+    public static int getTableIndex(Long uniqueId) {
         // 从ID中提取手机号哈希值
         long mobileHash = (uniqueId >> 40) & 0xFFFFFFFFFFFFL;
         // 先取模总表数8192，再除以16（库数），得到每个库下的表索引（0-511）
@@ -129,7 +130,7 @@ public class IDUtils {
      */
     private static int getProcessId() {
         try {
-            String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+            String processName = ManagementFactory.getRuntimeMXBean().getName();
             return Integer.parseInt(processName.split("@")[0]);
         } catch (Exception e) {
             return RANDOM.nextInt(1024); // 失败则生成随机进程ID

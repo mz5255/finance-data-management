@@ -22,12 +22,6 @@ public interface AuthService {
      */
     BaseResult<?> register(UserRegisterRequest userRegisterRequest);
 
-    /**
-     * 用户登录
-     */
-    BaseResult<UserInfo> query(UserQueryRequest userQueryRequest);
-
-
     void captchaImage(String telephone);
 
     BaseResult<LoginReq> login(LoginParam loginParam);

@@ -24,4 +24,10 @@ public class RegisterParam {
     @NotBlank(message = "验证码不能为空")
     private String captcha;
 
+    /**
+     * 密码
+     * 不输入则取手机号
+     */
+    private String password;
+
 }

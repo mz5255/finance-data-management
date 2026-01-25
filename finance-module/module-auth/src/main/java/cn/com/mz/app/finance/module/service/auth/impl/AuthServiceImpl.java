@@ -2,16 +2,16 @@ package cn.com.mz.app.finance.module.service.auth.impl;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
+import cn.com.mz.app.finance.common.utils.IDUtils;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
-import cn.com.mz.app.finance.module.dto.req.condition.UserIdQueryCondition;
-import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneAndPasswordQueryCondition;
-import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneQueryCondition;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
+import cn.com.mz.app.finance.module.service.query.QueryMemberService;
+import cn.com.mz.app.finance.module.service.query.impl.QueryMemberServiceImpl;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.com.mz.app.finance.starter.lock.DistributeLock;
@@ -19,7 +19,6 @@ import cn.com.mz.app.finance.starter.utils.RedisUtils;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
@@ -44,7 +43,7 @@ import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_P
  * @project finance-data-management
  * @package cn.com.mz.app.finance.module.service
  * @date 2025/9/14 22:52
- * @description: 功能描述
+ * @description: 权限管理
  */
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -58,7 +57,8 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private HttpServletResponse response;
     @Resource
-
+    private QueryMemberService queryMemberService;
+    @Resource
     private RedisUtils redisUtils;
 
     private static final String ROOT_CAPTCHA = "5255";
@@ -67,14 +67,14 @@ public class AuthServiceImpl implements AuthService {
      */
     private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
     /**
-     * 用户名布隆过滤器
+     * 用户id布隆过滤器
      */
-    private RBloomFilter<String> nickNameBloomFilter;
+    private RBloomFilter<Long> userIdBloomFilter;
 
     /**
      * 通过用户ID对用户信息做的缓存
      */
-    private Cache<String, UserDO> idUserCache;
+    private Cache<Long, UserDO> idUserCache;
 
     @PostConstruct
     public void init() {
@@ -90,13 +90,10 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = Exception.class)
     public BaseResult<?> register(UserRegisterRequest userRegisterRequest) {
         var telephone = userRegisterRequest.getTelephone();
-        String defaultNickName;
-        String randomString;
+        Long userId;
         do {
-            randomString = RandomUtil.randomString(6).toUpperCase();
-            //前缀 + 6位随机数 + 手机号后四位
-            defaultNickName = randomString + telephone.substring(7, 11);
-        } while (nickNameExist(defaultNickName));
+            userId = IDUtils.generateUniqueId(telephone);
+        } while (userIdExist(userId));
 
         if (StringUtils.isNotBlank(telephone)) {
             UserDO userDO = userService.getByTelephone(telephone);
@@ -105,34 +102,16 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        UserDO user = register(telephone, defaultNickName, telephone);
+        UserDO user = register(userId, userRegisterRequest);
         Assert.notNull(user, "用户注册失败");
 
-        addNickName(defaultNickName);
+        addUserId(userId);
         updateUserCache(user.getId(), user);
 
         return BaseResult.success(user);
     }
 
-    public BaseResult<UserInfo> query(UserQueryRequest userQueryRequest) {
-        //使用switch表达式精简代码，如果这里编译不过，参考我的文档调整IDEA的JDK版本
-        UserDO user = switch (userQueryRequest.getUserQueryCondition()) {
-            case UserIdQueryCondition userIdQueryCondition:
-                yield userService.getById(userIdQueryCondition.getUserId());
-            case UserPhoneQueryCondition userPhoneQueryCondition:
-                yield userService.getByTelephone(userPhoneQueryCondition.getTelephone());
-            case UserPhoneAndPasswordQueryCondition userPhoneAndPasswordQueryCondition:
-                yield userService.getByPhoneAndPass(userPhoneAndPasswordQueryCondition.getTelephone(), userPhoneAndPasswordQueryCondition.getPassword());
-            default:
-                throw new BusinessException("该查询方式为被定义: " + userQueryRequest.getUserQueryCondition().getClass().getName() + "，请检查");
-        };
 
-        BaseResult<UserInfo> response = new BaseResult();
-        response.setCode(200);
-        UserInfo userInfo = UserConvertor.INSTANCE.mapToVo(user);
-        response.setData(userInfo);
-        return response;
-    }
 
     @Override
     public void captchaImage(String telephone) {
@@ -173,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
         }
         return captcha.toString();
     }
+
     /**
      * 创建验证码图片
      */
@@ -212,38 +192,39 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 注册
      *
-     * @param telephone
-     * @param nickName
-     * @param password
+     * @param userId
+     * @param req
      * @return
      */
-    private UserDO register(String telephone, String nickName, String password) {
-
+    private UserDO register(Long userId, UserRegisterRequest req) {
         UserDO user = new UserDO();
-        user.register(telephone, nickName, password);
+        user.register(userId, req.getTelephone(), req.getPassword());
         return userService.save(user) ? user : null;
     }
 
-    private boolean addNickName(String nickName) {
-        if (nickName != null) {
-            return this.nickNameBloomFilter != null && this.nickNameBloomFilter.add(nickName);
+    private boolean addUserId(Long userId) {
+        if (userId != null) {
+            return this.userIdBloomFilter != null && this.userIdBloomFilter.add(userId);
         }
         return true;
     }
-    public boolean nickNameExist(String nickName) {
+
+    public boolean userIdExist(Long userId) {
         //如果布隆过滤器中存在，再进行数据库二次判断
-        if (this.nickNameBloomFilter != null && this.nickNameBloomFilter.contains(nickName)) {
-            return userService.getByNikeName(nickName) != null;
+        if (this.userIdBloomFilter != null && this.userIdBloomFilter.contains(userId)) {
+            return userService.getById(userId) != null;
         }
 
         return false;
     }
-    private void updateUserCache(String userId, UserDO user) {
+
+    private void updateUserCache(Long userId, UserDO user) {
         idUserCache.put(userId, user);
     }
 
     /**
      * 登录
+     *
      * @param loginParam
      * @return
      */
@@ -258,7 +239,7 @@ public class AuthServiceImpl implements AuthService {
         //判断是注册还是登陆
         //查询用户信息
         UserQueryRequest userQueryRequest = new UserQueryRequest(loginParam.getTelephone());
-        BaseResult<UserInfo> userQueryResponse = query(userQueryRequest);
+        BaseResult<UserInfo> userQueryResponse = queryMemberService.query(userQueryRequest);
         UserInfo userInfo = userQueryResponse.getData();
         if (userInfo == null) {
             //需要注册
@@ -267,7 +248,7 @@ public class AuthServiceImpl implements AuthService {
 
             BaseResult<?> response = register(userRegisterRequest);
             if (response.isSuccess()) {
-                userQueryResponse = query(userQueryRequest);
+                userQueryResponse = queryMemberService.query(userQueryRequest);
                 userInfo = userQueryResponse.getData();
                 LoginReq loginVO = getLoginReq(loginParam, userInfo);
                 return BaseResult.success(loginVO);
@@ -281,7 +262,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     *  填充用户信息至上下文中 & 更新用户最后一次登录时间
+     * 填充用户信息至上下文中 & 更新用户最后一次登录时间
+     *
      * @param loginParam
      * @param userInfo
      * @return
@@ -293,7 +275,7 @@ public class AuthServiceImpl implements AuthService {
         StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
         LoginReq loginVO = new LoginReq(userInfo);
         UserDO userDO = UserConvertor.INSTANCE.mapToEntity(userInfo);
-        userDO.login();
+        userDO.login(loginParam.getPassword());
         userService.updateById(userDO);
         return loginVO;
     }

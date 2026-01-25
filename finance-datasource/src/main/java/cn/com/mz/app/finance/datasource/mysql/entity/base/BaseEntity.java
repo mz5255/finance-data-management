@@ -25,8 +25,7 @@ public class BaseEntity implements Serializable {
     /**
      * 主键
      */
-    @TableField(fill = FieldFill.INSERT)
-    private String id;
+    private Long id;
     /**
      * 是否删除
      */

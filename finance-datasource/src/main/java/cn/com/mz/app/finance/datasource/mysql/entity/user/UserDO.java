@@ -1,5 +1,6 @@
 package cn.com.mz.app.finance.datasource.mysql.entity.user;
 
+import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.base.BaseEntity;
 import cn.com.mz.app.finance.datasource.mysql.entity.handler.AesEncryptTypeHandler;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
@@ -89,12 +90,12 @@ public class UserDO extends BaseEntity {
      */
     private UserRole userRole;
 
-    public UserDO register(String telephone, String nickName, String password) {
-        this.setId();
+    public UserDO register(Long userId, String telephone, String password) {
+        this.setId(userId);
         this.telephone = telephone;
         this.nickName = nickName;
-        this.salt = UUID.randomUUID().toString().substring(0,4);
-        this.passwordHash = DigestUtil.md5Hex(password+this,salt);
+        this.salt = UUID.randomUUID().toString().substring(0, 4);
+        this.passwordHash = DigestUtil.md5Hex(password, salt);
         this.state = UserStateEnum.INIT;
         this.userRole = UserRole.CUSTOMER;
         return this;
@@ -122,8 +123,12 @@ public class UserDO extends BaseEntity {
         return this;
     }
 
-    public void login(){
+    public void login(String password) {
         this.lastLoginTime = LocalTime.now();
+        this.passwordHash = DigestUtil.md5Hex(password, salt);
+        if (!password.equals(this.passwordHash)) {
+            throw new BusinessException("密码错误");
+        }
     }
 
     public boolean canModifyInfo() {

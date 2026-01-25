@@ -35,7 +35,7 @@ public class DistributeLockAspect {
     public DistributeLockAspect(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
     }
-    @Around("@annotation(cn.hollis.nft.turbo.lock.DistributeLock)")
+    @Around("@annotation(cn.com.mz.app.finance.starter.lock.DistributeLock)")
     public Object process(ProceedingJoinPoint pjp) throws Exception {
         Object response = null;
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
@@ -46,9 +46,11 @@ public class DistributeLockAspect {
             if (DistributeLockConstant.NONE_KEY.equals(distributeLock.keyExpression())) {
                 throw new BusinessException("no lock key found...");
             }
+            // 解析表达式 #telephone  解析为 phone
             SpelExpressionParser parser = new SpelExpressionParser();
             Expression expression = parser.parseExpression(distributeLock.keyExpression());
 
+            // 创建标准求值上下文，用于存储表达式求值时所需的变量和函数
             EvaluationContext context = new StandardEvaluationContext();
             // 获取参数值
             Object[] args = pjp.getArgs();
@@ -69,6 +71,7 @@ public class DistributeLockAspect {
             key = String.valueOf(expression.getValue(context));
         }
 
+        // 锁场景
         String scene = distributeLock.scene();
 
         String lockKey = scene + "#" + key;
@@ -108,6 +111,7 @@ public class DistributeLockAspect {
         } catch (Throwable e) {
             throw new Exception(e);
         } finally {
+            // 检查当前线程是否持有读锁，如果持有则进行解锁操作并记录日志
             if (rLock.isHeldByCurrentThread()) {
                 rLock.unlock();
                 log.info(String.format("unlock for key : %s , expire : %s", lockKey, expireTime));

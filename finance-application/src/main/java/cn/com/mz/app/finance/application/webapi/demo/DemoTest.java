@@ -24,7 +24,7 @@ public class DemoTest {
         return BaseResult.success();
     }
 
-    @RequiresRoles(value = {"admin", "manager"}, logical = RequiresRoles.Logical.OR)
+    @RequiresRoles(value = {"admin", "customer"}, logical = RequiresRoles.Logical.OR)
     @PostMapping("/delete")
     public BaseResult<Boolean> deleteUser() {
         // 需要admin或manager角色才能访问

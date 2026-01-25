@@ -5,13 +5,13 @@ import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
+import cn.com.mz.app.finance.module.dto.req.QueryParam;
 import cn.com.mz.app.finance.module.dto.req.RegisterParam;
-import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
+import cn.com.mz.app.finance.module.service.query.QueryMemberService;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.com.mz.app.finance.starter.utils.RedisUtils;
-import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,9 +39,12 @@ public class AuthController {
     private RedisUtils redisUtils;
     @Resource
     private AuthService authService;
+    @Resource
+    private QueryMemberService queryMemberService;
 
 
     @GetMapping("/captchaImage")
+    @Operation(summary = "获取图片验证码", description = "获取图片验证码")
     public void captchaImage(@IsMobile String telephone) {
         authService.captchaImage(telephone);
     }
@@ -58,6 +61,7 @@ public class AuthController {
         //注册
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
         userRegisterRequest.setTelephone(registerParam.getTelephone());
+        userRegisterRequest.setPassword(registerParam.getPassword());
 
         BaseResult<?> registerResult = authService.register(userRegisterRequest);
         if(registerResult.isSuccess()){
@@ -75,6 +79,17 @@ public class AuthController {
     @Operation(summary = "登录")
     public BaseResult<LoginReq> login(@Valid @RequestBody LoginParam loginParam) {
         return authService.login(loginParam);
+    }
+
+    /**
+     * 查询用户信息
+     *
+     * @return 结果
+     */
+    @GetMapping("/query")
+    @Operation(summary = "查询用户信息")
+    public BaseResult<UserInfo> query(@RequestBody QueryParam queryParam) {
+        return queryMemberService.getMember(queryParam);
     }
 
 

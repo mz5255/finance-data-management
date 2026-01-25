@@ -274,7 +274,7 @@ public class AuthServiceImpl implements AuthService {
                 .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
         StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
         LoginReq loginVO = new LoginReq(userInfo);
-        UserDO userDO = UserConvertor.INSTANCE.mapToEntity(userInfo);
+        UserDO userDO = UserConvertor.INSTANCE.toUserDO(userInfo);
         userDO.login(loginParam.getPassword());
         userService.updateById(userDO);
         return loginVO;

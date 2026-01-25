@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalTime;
 import java.util.UUID;
@@ -20,6 +21,7 @@ import java.util.UUID;
  * @author mz
  */
 @Getter
+@Setter
 @TableName("Users")
 public class UserDO extends BaseEntity {
     /**

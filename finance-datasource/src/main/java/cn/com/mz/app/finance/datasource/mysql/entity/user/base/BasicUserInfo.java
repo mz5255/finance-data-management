@@ -7,7 +7,9 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * 简单的用户信息，只返回部分字段，避免过多不该返回的信息被返回
+ * 基础用户信息 VO
+ * <p>
+ * 仅包含用户的基本展示信息，用于对外接口返回，避免暴露敏感数据
  *
  * @author Hollis
  */
@@ -19,12 +21,12 @@ public class BasicUserInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户Id
+     * 用户 ID
      */
     private String userId;
 
     /**
-     * 昵称
+     * 用户昵称
      */
     private String nickName;
 

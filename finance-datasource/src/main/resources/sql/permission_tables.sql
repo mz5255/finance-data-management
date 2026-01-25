@@ -68,3 +68,22 @@ INSERT INTO `sys_menu` VALUES (4, '菜单管理', 1, 3, 'menu', 'system/menu/ind
 INSERT INTO `sys_user_role` VALUES (1, 1);
 INSERT INTO `sys_role_menu` VALUES (1, 1), (1, 2), (1, 3), (1, 4);
 INSERT INTO `sys_role_menu` VALUES (2, 1), (2, 2);
+
+-- 创建 user 表
+CREATE TABLE IF NOT EXISTS user (
+    id BIGINT PRIMARY KEY COMMENT '用户ID',
+    username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
+    password VARCHAR(255) NOT NULL COMMENT '密码',
+    email VARCHAR(100) COMMENT '邮箱',
+    phone VARCHAR(20) COMMENT '手机号',
+    real_name VARCHAR(50) COMMENT '真实姓名',
+    gender TINYINT DEFAULT 0 COMMENT '性别: 0-未知, 1-男, 2-女',
+    age INT COMMENT '年龄',
+    status TINYINT DEFAULT 1 COMMENT '状态: 0-禁用, 1-启用',
+    created_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted_at DATETIME DEFAULT NULL COMMENT '软删除时间',
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_phone (phone)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';

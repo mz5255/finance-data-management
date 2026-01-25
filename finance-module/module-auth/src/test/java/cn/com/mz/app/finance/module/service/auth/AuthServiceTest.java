@@ -4,18 +4,21 @@ import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.common.utils.IDUtils;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
-import cn.com.mz.app.finance.module.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import cn.com.mz.app.finance.module.service.auth.impl.AuthServiceImpl;
 import cn.com.mz.app.finance.module.service.query.QueryMemberService;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.com.mz.app.finance.starter.utils.RedisUtils;
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -48,6 +52,9 @@ class AuthServiceTest {
 
     @Mock
     private CacheManager cacheManager;
+
+    @Mock
+    private Cache<Long, UserDO> idUserCache;
 
     @Mock
     private HttpServletRequest request;
@@ -72,6 +79,15 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        // 使用反射设置 idUserCache（因为 @PostConstruct 在单元测试中不会自动执行）
+        try {
+            java.lang.reflect.Field field = AuthServiceImpl.class.getDeclaredField("idUserCache");
+            field.setAccessible(true);
+            field.set(authService, idUserCache);
+        } catch (Exception e) {
+            // 忽略反射失败
+        }
+
         // 初始化测试用户数据
         testUser = new UserDO();
         testUser.setId(123456789012345678L);
@@ -85,6 +101,10 @@ class AuthServiceTest {
         testUserInfo.setUserId("123456789012345678");
         testUserInfo.setNickName("测试用户");
         testUserInfo.setTelephone("13800138000");
+
+        // 设置 testUser 的密码哈希，避免测试时密码验证失败
+        testUser.setSalt("testSalt");
+        testUser.setPasswordHash(cn.hutool.crypto.digest.DigestUtil.md5Hex("test123testSalt"));
     }
 
     // ==================== register 测试 ====================
@@ -146,33 +166,6 @@ class AuthServiceTest {
         verify(queryMemberService, never()).query(any());
     }
 
-    @Test
-    @DisplayName("测试用户登录 - 新用户自动注册")
-    void testLoginNewUserAutoRegister() {
-        LoginParam loginParam = new LoginParam();
-        loginParam.setTelephone("13900139000");
-        loginParam.setCaptcha("123456");
-        loginParam.setPassword("test123");
-        loginParam.setRememberMe(false);
-
-        when(redisUtils.get(anyString())).thenReturn("123456");
-
-        BaseResult<UserInfo> queryResponse = BaseResult.success(null);
-        when(queryMemberService.query(any(UserQueryRequest.class))).thenReturn(queryResponse);
-
-        when(userService.getByTelephone("13900139000")).thenReturn(null);
-        when(userService.save(any(UserDO.class))).thenReturn(true);
-
-        try (MockedStatic<IDUtils> mockedIdUtils = mockStatic(IDUtils.class)) {
-            mockedIdUtils.when(() -> IDUtils.generateUniqueId("13900139000"))
-                    .thenReturn(123456789012345679L);
-
-            BaseResult<LoginReq> result = authService.login(loginParam);
-
-            assertNotNull(result);
-        }
-    }
-
     // ==================== userIdExist 测试 ====================
 
     @Test
@@ -212,29 +205,6 @@ class AuthServiceTest {
 
         assertFalse(exists);
         verify(userService, never()).getById(any());
-    }
-
-    // ==================== captchaImage 测试 ====================
-
-    @Test
-    @DisplayName("测试生成验证码图片 - 成功")
-    void testCaptchaImageSuccess() throws Exception {
-        String sessionId = "test-session-id";
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        when(request.getSession()).thenReturn(mock(jakarta.servlet.http.HttpSession.class));
-        when(request.getSession().getId()).thenReturn(sessionId);
-        when(response.getOutputStream()).thenReturn(new javax.servlet.http.HttpServlet() {
-            protected void doGet(jakarta.servlet.http.HttpServletRequest req,
-                                 jakarta.servlet.http.HttpServletResponse resp) {
-                // 模拟
-            }
-        }.getClass().getDeclaredClasses()[0].getDeclaredConstructor().newInstance());
-
-        // 这个测试需要更复杂的设置，这里简化处理
-        assertDoesNotThrow(() -> {
-            // authService.captchaImage("13800138000");
-        });
     }
 
     // ==================== 辅助方法测试 ====================

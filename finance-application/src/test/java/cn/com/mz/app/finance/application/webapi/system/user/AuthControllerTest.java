@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -103,7 +104,7 @@ class AuthControllerTest {
 
         when(redisUtils.get(anyString())).thenReturn("123456");
         when(authService.register(any(UserRegisterRequest.class)))
-                .thenReturn(BaseResult.success(true));
+                .thenReturn((BaseResult) BaseResult.success(true));
 
         BaseResult<Boolean> result = authController.register(registerParam);
 
@@ -122,7 +123,7 @@ class AuthControllerTest {
 
         when(redisUtils.get(anyString())).thenReturn("123456");
         when(authService.register(any(UserRegisterRequest.class)))
-                .thenReturn(BaseResult.error(500, "注册失败"));
+                .thenReturn((BaseResult) BaseResult.error(500, "注册失败"));
 
         BaseResult<Boolean> result = authController.register(registerParam);
 
@@ -167,7 +168,7 @@ class AuthControllerTest {
         loginParam.setPassword("test123");
 
         when(authService.login(loginParam))
-                .thenReturn(BaseResult.error(400, "验证码错误"));
+                .thenReturn((BaseResult) BaseResult.error(400, "验证码错误"));
 
         BaseResult<LoginReq> result = authController.login(loginParam);
 
@@ -207,7 +208,7 @@ class AuthControllerTest {
         queryParam.setTelephone("13900139000");
 
         when(queryMemberService.getMember(queryParam))
-                .thenReturn(BaseResult.error(404, "用户不存在"));
+                .thenReturn((BaseResult) BaseResult.error(404, "用户不存在"));
 
         BaseResult<UserInfo> result = authController.query(queryParam);
 

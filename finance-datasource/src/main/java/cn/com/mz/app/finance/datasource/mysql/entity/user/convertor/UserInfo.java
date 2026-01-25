@@ -11,6 +11,10 @@ import lombok.Setter;
 import java.util.Date;
 
 /**
+ * 用户信息 VO
+ * <p>
+ * 完整的用户信息展示对象，继承自 BasicUserInfo，包含更多用户详细信息
+ *
  * @author Hollis
  */
 @Getter
@@ -21,20 +25,20 @@ public class UserInfo extends BasicUserInfo {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 手机号
+     * 手机号（脱敏）
      */
     @SensitiveStrategyPhone
     private String telephone;
 
     /**
-     * 状态
+     * 用户状态
      *
      * @see UserStateEnum
      */
     private String state;
 
     /**
-     * 实名认证
+     * 是否已实名认证
      */
     private Boolean certification;
 
@@ -48,15 +52,20 @@ public class UserInfo extends BasicUserInfo {
      */
     private Date createTime;
 
+    /**
+     * 判断用户是否具有购买资格
+     * <p>
+     * 购买资格判断标准：
+     * <ul>
+     *   <li>用户角色必须是 CUSTOMER（客户）</li>
+     *   <li>必须完成实名认证</li>
+     * </ul>
+     *
+     * @return true 如果用户具有购买资格，否则返回 false
+     */
     public boolean userCanBuy() {
-
-        if (this.getUserRole() != null && !this.getUserRole().equals(UserRole.CUSTOMER)) {
-            return false;
-        }
-        //是否实名认证
-        if (this.getState() != null && !this.getCertification()) {
-            return false;
-        }
-        return true;
+        boolean isCustomer = getUserRole() == UserRole.CUSTOMER;
+        boolean isCertified = getCertification() != null && getCertification();
+        return isCustomer && isCertified;
     }
 }

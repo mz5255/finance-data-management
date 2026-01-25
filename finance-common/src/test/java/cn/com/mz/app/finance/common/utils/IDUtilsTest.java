@@ -261,7 +261,7 @@ class IDUtilsTest {
     void testMaxDbIndex() {
         // 测试能否产生最大库索引（15）
         boolean foundMaxDbIndex = false;
-        for (int i = 13000000000; i < 19999999999L; i += 100000000) {
+        for (long i = 13000000000L; i < 19999999999L; i += 100000000L) {
             try {
                 String phone = String.valueOf(i);
                 if (phone.length() == 11 && phone.matches("^1[3-9]\\d{9}$")) {
@@ -285,7 +285,7 @@ class IDUtilsTest {
     void testMaxTableIndex() {
         // 测试能否产生最大表索引（511）
         boolean foundMaxTableIndex = false;
-        for (int i = 13000000000; i < 19999999999L; i += 100000000) {
+        for (long i = 13000000000L; i < 19999999999L; i += 100000000L) {
             try {
                 String phone = String.valueOf(i);
                 if (phone.length() == 11 && phone.matches("^1[3-9]\\d{9}$")) {

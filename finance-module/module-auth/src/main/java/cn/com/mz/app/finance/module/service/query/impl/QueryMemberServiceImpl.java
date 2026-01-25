@@ -58,7 +58,7 @@ public class QueryMemberServiceImpl implements QueryMemberService {
 
         BaseResult<UserInfo> response = new BaseResult();
         response.setCode(200);
-        UserInfo userInfo = UserConvertor.INSTANCE.mapToVo(user);
+        UserInfo userInfo = UserConvertor.INSTANCE.toUserInfo(user);
         response.setData(userInfo);
         return response;
     }

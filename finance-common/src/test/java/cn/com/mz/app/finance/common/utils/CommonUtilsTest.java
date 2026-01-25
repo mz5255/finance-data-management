@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * CommonUtils 单元测试
  *
@@ -147,7 +149,7 @@ class CommonUtilsTest {
     @Test
     @DisplayName("测试列表转换：null列表输入")
     void testListToListWithNullList() {
-        List<String> result = CommonUtils.listToList(null, String::toUpperCase);
+        List<String> result = CommonUtils.listToList(null, (String s) -> s == null ? null : s.toUpperCase());
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -372,10 +374,10 @@ class CommonUtilsTest {
         Set<String> uniqueNames = CommonUtils.listToSet(upperNames);
         assertEquals(3, uniqueNames.size());
 
-        // 3. 转为Map（name -> length）
-        Map<String, Integer> nameLengthMap = CommonUtils.listToMap(
+        // 3. 转为Map（name -> name）- 演示用法
+        Map<String, String> nameLengthMap = CommonUtils.listToMap(
                 new ArrayList<>(uniqueNames),
-                String::valueOf
+                s -> s
         );
         // 这里只是演示，实际Map的value还是String
         assertEquals(3, nameLengthMap.size());

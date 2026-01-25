@@ -11,24 +11,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    </properties>
-
     <dependencies>
-
-
-        <!--    Mybatis    -->
+        <!-- MyBatis Spring Boot Starter -->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>3.0.3</version>
         </dependency>
 
-        <!--     Mybatis Plus    -->
+        <!-- MyBatis-Plus Spring Boot 3 Starter -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
@@ -42,11 +33,11 @@
             <version>3.5.5</version>
         </dependency>
 
-        <!-- MySQL JDBC 驱动 -->
+        <!-- MySQL Connector J (推荐使用新驱动) -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.27</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Druid 数据库连接池 -->
@@ -55,17 +46,25 @@
             <artifactId>druid</artifactId>
             <version>1.2.20</version>
         </dependency>
+
+        <!-- Finance Common Module -->
         <dependency>
             <groupId>cn.com.mz.app</groupId>
             <artifactId>finance-common</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
+
+        <!-- MapStruct 对象映射 -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
         </dependency>
 
+        <!-- Lombok-MapStruct 绑定桥接库 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

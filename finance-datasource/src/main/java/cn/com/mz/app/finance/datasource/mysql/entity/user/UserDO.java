@@ -97,7 +97,7 @@ public class UserDO extends BaseEntity {
         this.telephone = telephone;
         this.nickName = nickName;
         this.salt = UUID.randomUUID().toString().substring(0, 4);
-        this.passwordHash = DigestUtil.md5Hex(password, salt);
+        this.passwordHash = DigestUtil.md5Hex(password + salt);
         this.state = UserStateEnum.INIT;
         this.userRole = UserRole.CUSTOMER;
         return this;
@@ -127,8 +127,8 @@ public class UserDO extends BaseEntity {
 
     public void login(String password) {
         this.lastLoginTime = LocalTime.now();
-        this.passwordHash = DigestUtil.md5Hex(password, salt);
-        if (!password.equals(this.passwordHash)) {
+        String inputPasswordHash = DigestUtil.md5Hex(password + salt);
+        if (!inputPasswordHash.equals(this.passwordHash)) {
             throw new BusinessException("密码错误");
         }
     }

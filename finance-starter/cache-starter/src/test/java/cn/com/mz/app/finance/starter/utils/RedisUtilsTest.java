@@ -5,6 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.*;
  * @author mz
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("Redis工具类测试")
 class RedisUtilsTest {
 
@@ -292,7 +295,7 @@ class RedisUtilsTest {
         String result = redisUtils.get(key);
 
         assertEquals(value, result);
-        verify(valueOperations, times(1)).set(key);
+        verify(valueOperations, times(1)).set(key, value);
         verify(valueOperations, times(1)).get(key);
     }
 

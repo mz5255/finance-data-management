@@ -39,10 +39,11 @@
             <artifactId>module-user</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
+
+        <!-- Spring Boot Test (集成测试需要) -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

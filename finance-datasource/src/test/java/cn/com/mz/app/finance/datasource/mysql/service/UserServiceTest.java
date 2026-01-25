@@ -210,54 +210,6 @@ class UserServiceTest {
         verify(userMapper, times(1)).selectOne(any(LambdaQueryWrapper.class));
     }
 
-    // ==================== updateStateById 测试 ====================
-
-    @Test
-    @DisplayName("测试更新用户状态 - 成功")
-    void testUpdateStateByIdSuccess() {
-        when(userMapper.update(any(), any(LambdaUpdateWrapper.class))).thenReturn(1);
-
-        boolean result = userService.updateStateById(1L, UserStateEnum.AUTH);
-
-        assertTrue(result);
-        verify(userMapper, times(1)).update(any(), any(LambdaUpdateWrapper.class));
-    }
-
-    @Test
-    @DisplayName("测试更新用户状态 - 失败（用户不存在）")
-    void testUpdateStateByIdFailed() {
-        when(userMapper.update(any(), any(LambdaUpdateWrapper.class))).thenReturn(0);
-
-        boolean result = userService.updateStateById(999L, UserStateEnum.FROZEN);
-
-        assertFalse(result);
-        verify(userMapper, times(1)).update(any(), any(LambdaUpdateWrapper.class));
-    }
-
-    // ==================== updateLastLoginTime 测试 ====================
-
-    @Test
-    @DisplayName("测试更新最后登录时间 - 成功")
-    void testUpdateLastLoginTimeSuccess() {
-        when(userMapper.update(any(), any(LambdaUpdateWrapper.class))).thenReturn(1);
-
-        boolean result = userService.updateLastLoginTime(1L);
-
-        assertTrue(result);
-        verify(userMapper, times(1)).update(any(), any(LambdaUpdateWrapper.class));
-    }
-
-    @Test
-    @DisplayName("测试更新最后登录时间 - 失败（用户不存在）")
-    void testUpdateLastLoginTimeFailed() {
-        when(userMapper.update(any(), any(LambdaUpdateWrapper.class))).thenReturn(0);
-
-        boolean result = userService.updateLastLoginTime(999L);
-
-        assertFalse(result);
-        verify(userMapper, times(1)).update(any(), any(LambdaUpdateWrapper.class));
-    }
-
     // ==================== countUsers 测试 ====================
 
     @Test

@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.Date;
 
 /**
- * @author Hollis
+ * @author mz
  */
 @Getter
 @Setter
@@ -47,6 +47,11 @@ public class UserInfo extends BasicUserInfo {
      * 注册时间
      */
     private Date createTime;
+
+    /**
+     * 密码盐
+     */
+    private String salt;
 
     public boolean userCanBuy() {
 

@@ -10,7 +10,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -95,7 +97,7 @@ public class UserDO extends BaseEntity {
         this.telephone = telephone;
         this.nickName = nickName;
         this.salt = UUID.randomUUID().toString().substring(0, 4);
-        this.passwordHash = DigestUtil.md5Hex(password, salt);
+        this.passwordHash = DigestUtil.md5Hex(password + salt, StandardCharsets.UTF_8);
         this.state = UserStateEnum.INIT;
         this.userRole = UserRole.CUSTOMER;
         return this;
@@ -125,7 +127,7 @@ public class UserDO extends BaseEntity {
 
     public void login(String password) {
         this.lastLoginTime = LocalTime.now();
-        this.passwordHash = DigestUtil.md5Hex(password, salt);
+        password = DigestUtil.md5Hex(password + salt, StandardCharsets.UTF_8);
         if (!password.equals(this.passwordHash)) {
             throw new BusinessException("密码错误");
         }

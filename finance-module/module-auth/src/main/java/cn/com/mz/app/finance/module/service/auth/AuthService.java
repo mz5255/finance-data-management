@@ -1,9 +1,7 @@
 package cn.com.mz.app.finance.module.service.auth;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
-import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 
@@ -22,7 +20,7 @@ public interface AuthService {
      */
     BaseResult<?> register(UserRegisterRequest userRegisterRequest);
 
-    void captchaImage(String telephone);
+    void captchaImage(String captchaKey);
 
     BaseResult<LoginReq> login(LoginParam loginParam);
 }

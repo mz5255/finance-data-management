@@ -7,7 +7,6 @@
     <groupId>cn.com.mz.app</groupId>
     <artifactId>finance-data-mangement</artifactId>
     <version>1.0-RELEASE</version>
-    <name>finance-data-mangement</name>
     <packaging>pom</packaging>
     <modules>
         <module>finance-module</module>

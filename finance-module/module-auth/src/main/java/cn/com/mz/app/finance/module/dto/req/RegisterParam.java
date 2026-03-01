@@ -30,4 +30,9 @@ public class RegisterParam {
      */
     private String password;
 
+    /**
+     * 验证码标识
+     */
+    private String captchaKey;
+
 }

@@ -1,6 +1,5 @@
 package cn.com.mz.app.finance.application.webapi.system.user;
 
-import cn.com.mz.app.finance.common.aspect.mobile.IsMobile;
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
@@ -45,15 +44,15 @@ public class AuthController {
 
     @GetMapping("/captchaImage")
     @Operation(summary = "获取图片验证码", description = "获取图片验证码")
-    public void captchaImage(@IsMobile String telephone) {
-        authService.captchaImage(telephone);
+    public void captchaImage(@RequestParam String captchaKey) {
+        authService.captchaImage(captchaKey);
     }
 
     @PostMapping("/register")
     @Operation(summary = "注册", description = "用户注册")
     public BaseResult<Boolean> register(@Valid @RequestBody RegisterParam registerParam) {
         //验证码校验
-        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + registerParam.getTelephone());
+        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + registerParam.getCaptchaKey());
         if (!StringUtils.equalsIgnoreCase(cachedCode, registerParam.getCaptcha())) {
             throw new BusinessException("验证码错误");
         }
@@ -103,5 +102,19 @@ public class AuthController {
     public BaseResult<Boolean> logout() {
         StpUtil.logout();
         return BaseResult.success(true);
+    }
+
+    /**
+     * 获取Token
+     * @return Token信息
+     * StpUtil.getLoginId() → 获取用户ID
+     * StpUtil.getSession().get(userId) → 获取UserInfo对象
+     * StpUtil.getTokenValue() → 获取Token字符串本身
+     */
+    @GetMapping("/token")
+    @Operation(summary = "获取Token")
+    public BaseResult<String> getToken() {
+        String token = StpUtil.getTokenValue();
+        return BaseResult.success(token);
     }
 }

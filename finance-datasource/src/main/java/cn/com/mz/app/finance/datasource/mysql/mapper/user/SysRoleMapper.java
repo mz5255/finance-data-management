@@ -21,7 +21,7 @@ public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
      * @param userId 用户ID
      * @return 角色列表
      */
-    List<SysRoleDO> selectRolesByUserId(@Param("userId") String userId);
+    List<SysRoleDO> selectRolesByUserId(@Param("userId") Long userId);
 
     /**
      * 根据用户ID查询角色权限
@@ -29,5 +29,5 @@ public interface SysRoleMapper extends BaseMapper<SysRoleDO> {
      * @param userId 用户ID
      * @return 权限列表
      */
-    List<String> selectRolePermissionByUserId(@Param("userId") String userId);
+    List<String> selectRolePermissionByUserId(@Param("userId") Long userId);
 }

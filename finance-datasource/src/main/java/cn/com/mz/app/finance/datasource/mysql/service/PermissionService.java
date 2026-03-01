@@ -40,7 +40,7 @@ public class PermissionService {
      * @param userId 用户ID
      * @return 角色权限集合
      */
-    public Set<String> getRolePermission(String userId) {
+    public Set<String> getRolePermission(Long userId) {
         List<SysRoleDO> roles = roleMapper.selectRolesByUserId(userId);
         return roles.stream()
                 .map(SysRoleDO::getRoleKey)
@@ -53,7 +53,7 @@ public class PermissionService {
      * @param userId 用户ID
      * @return 菜单权限集合
      */
-    public Set<String> getMenuPermission(String userId) {
+    public Set<String> getMenuPermission(Long userId) {
         List<String> perms = menuMapper.selectMenuPermsByUserId(userId);
         return perms.stream()
                 .filter(perm -> perm != null && !perm.isEmpty())
@@ -66,7 +66,7 @@ public class PermissionService {
      * @param userId 用户ID
      * @return 菜单树
      */
-    public List<SysMenuDO> getMenuTreeByUserId(String userId) {
+    public List<SysMenuDO> getMenuTreeByUserId(Long userId) {
         List<SysMenuDO> menus = menuMapper.selectMenuTreeByUserId(userId);
         return buildMenuTree(menus, 0L);
     }
@@ -92,7 +92,7 @@ public class PermissionService {
      * @param permission 权限标识
      * @return 是否有权限
      */
-    public boolean hasPermission(String userId, String permission) {
+    public boolean hasPermission(Long userId, String permission) {
         Set<String> permissions = getMenuPermission(userId);
         return permissions.contains(permission);
     }
@@ -104,7 +104,7 @@ public class PermissionService {
      * @param roleKey 角色标识
      * @return 是否有角色
      */
-    public boolean hasRole(String userId, String roleKey) {
+    public boolean hasRole(Long userId, String roleKey) {
         Set<String> roles = getRolePermission(userId);
         return roles.contains(roleKey);
     }
@@ -117,7 +117,7 @@ public class PermissionService {
      * @return 是否成功
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean assignRolesToUser(String userId, List<Long> roleIds) {
+    public boolean assignRolesToUser(Long userId, List<Long> roleIds) {
         // 先删除用户现有角色
         userRoleMapper.deleteByUserId(userId);
 

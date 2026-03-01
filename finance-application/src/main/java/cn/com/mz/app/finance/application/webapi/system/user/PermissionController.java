@@ -35,7 +35,7 @@ public class PermissionController {
     @PostMapping("/assignRoles")
     @Operation(summary = "为用户分配角色")
     @RequiresPermissions("system:user:edit")
-    public BaseResult<Boolean> assignRolesToUser(@RequestParam String userId, @RequestBody List<Long> roleIds) {
+    public BaseResult<Boolean> assignRolesToUser(@RequestParam Long userId, @RequestBody List<Long> roleIds) {
         boolean success = permissionService.assignRolesToUser(userId, roleIds);
         return BaseResult.success(success);
     }
@@ -64,7 +64,7 @@ public class PermissionController {
     @GetMapping("/userRoles/{userId}")
     @Operation(summary = "获取用户角色")
     @RequiresPermissions("system:user:query")
-    public BaseResult<List<String>> getUserRoles(@PathVariable String userId) {
+    public BaseResult<List<String>> getUserRoles(@PathVariable Long userId) {
         var roles = permissionService.getRolePermission(userId);
         return BaseResult.success(roles.stream().toList());
     }
@@ -78,7 +78,7 @@ public class PermissionController {
     @GetMapping("/userPermissions/{userId}")
     @Operation(summary = "获取用户权限")
     @RequiresPermissions("system:user:query")
-    public BaseResult<List<String>> getUserPermissions(@PathVariable String userId) {
+    public BaseResult<List<String>> getUserPermissions(@PathVariable Long userId) {
         var permissions = permissionService.getMenuPermission(userId);
         return BaseResult.success(permissions.stream().toList());
     }
@@ -92,7 +92,7 @@ public class PermissionController {
      */
     @GetMapping("/checkPermission")
     @Operation(summary = "检查用户权限")
-    public BaseResult<Boolean> checkPermission(@RequestParam String userId, @RequestParam String permission) {
+    public BaseResult<Boolean> checkPermission(@RequestParam Long userId, @RequestParam String permission) {
         boolean hasPermission = permissionService.hasPermission(userId, permission);
         return BaseResult.success(hasPermission);
     }
@@ -106,7 +106,7 @@ public class PermissionController {
      */
     @GetMapping("/checkRole")
     @Operation(summary = "检查用户角色")
-    public BaseResult<Boolean> checkRole(@RequestParam String userId, @RequestParam String roleKey) {
+    public BaseResult<Boolean> checkRole(@RequestParam Long userId, @RequestParam String roleKey) {
         boolean hasRole = permissionService.hasRole(userId, roleKey);
         return BaseResult.success(hasRole);
     }
@@ -119,7 +119,7 @@ public class PermissionController {
      */
     @GetMapping("/getMenuTreeByUserId")
     @Operation(summary = "获取用户所有菜单")
-    public BaseResult<?> getMenuTreeByUserId(@RequestParam String userId) {
+    public BaseResult<?> getMenuTreeByUserId(@RequestParam Long userId) {
         List<SysMenuDO> menuTreeByUserId = permissionService.getMenuTreeByUserId(userId);
         return BaseResult.success(menuTreeByUserId);
     }

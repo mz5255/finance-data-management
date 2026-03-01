@@ -16,6 +16,7 @@ public class SwaggerRedirectFilter implements Filter {
         
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        // 重定向根路径到 Swagger UI
         String requestURI = httpRequest.getRequestURI();
         if ("/".equals(requestURI)) {
             httpResponse.sendRedirect("/swagger-ui.html");

@@ -2,6 +2,7 @@ package cn.com.mz.app.finance.module.service.auth.impl;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
+import cn.com.mz.app.finance.common.utils.AssertUtils;
 import cn.com.mz.app.finance.common.utils.IDUtils;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
@@ -11,7 +12,6 @@ import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
 import cn.com.mz.app.finance.module.service.query.QueryMemberService;
-import cn.com.mz.app.finance.module.service.query.impl.QueryMemberServiceImpl;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 import cn.com.mz.app.finance.starter.lock.DistributeLock;
@@ -103,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         UserDO user = register(userId, userRegisterRequest);
-        Assert.notNull(user, "用户注册失败");
+        AssertUtils.isNull(user, "用户注册失败");
 
         addUserId(userId);
         updateUserCache(user.getId(), user);
@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public void captchaImage(String telephone) {
+    public void captchaImage(String captchaKey) {
         try {
             // 设置响应头
             response.setHeader("Cache-Control", "no-store, no-cache");
@@ -127,11 +127,10 @@ public class AuthServiceImpl implements AuthService {
             BufferedImage image = createCaptchaImage(captchaText);
 
             // 将验证码存储到session或Redis中
-            String sessionId = request.getSession().getId();
             redisUtils.set(
-                    CAPTCHA_KEY_PREFIX + sessionId,
+                    CAPTCHA_KEY_PREFIX + captchaKey,
                     captchaText,
-                    5, TimeUnit.MINUTES
+                    1000000, TimeUnit.MINUTES
             );
 
             // 输出图片
@@ -231,7 +230,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public BaseResult<LoginReq> login(LoginParam loginParam) {
         //验证码校验
-        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + loginParam.getTelephone());
+        String cachedCode = redisUtils.get(CAPTCHA_KEY_PREFIX + loginParam.getCaptchaKey());
         if (!StringUtils.equalsIgnoreCase(cachedCode, loginParam.getCaptcha())) {
             throw new BusinessException("验证码错误");
         }
@@ -272,9 +271,9 @@ public class AuthServiceImpl implements AuthService {
     public LoginReq getLoginReq(LoginParam loginParam, UserInfo userInfo) {
         StpUtil.login(userInfo.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
                 .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
-        StpUtil.getSession().set(userInfo.getUserId().toString(), userInfo);
+        StpUtil.getSession().set("userId", userInfo.getUserId());
         LoginReq loginVO = new LoginReq(userInfo);
-        UserDO userDO = UserConvertor.INSTANCE.mapToEntity(userInfo);
+        UserDO userDO = userService.getById(userInfo.getUserId());
         userDO.login(loginParam.getPassword());
         userService.updateById(userDO);
         return loginVO;

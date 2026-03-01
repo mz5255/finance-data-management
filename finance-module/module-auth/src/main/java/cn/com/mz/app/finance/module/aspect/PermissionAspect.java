@@ -31,7 +31,7 @@ public class PermissionAspect {
     @Around("@annotation(requiresPermissions)")
     public Object checkPermission(ProceedingJoinPoint joinPoint, RequiresPermissions requiresPermissions) throws Throwable {
         // 获取当前用户ID
-        String userId = StpUtil.getLoginIdAsString();
+        Long userId = StpUtil.getLoginIdAsLong();
         
         String[] permissions = requiresPermissions.value();
         if (permissions.length == 0) {
@@ -75,7 +75,7 @@ public class PermissionAspect {
     @Around("@annotation(requiresRoles)")
     public Object checkRole(ProceedingJoinPoint joinPoint, RequiresRoles requiresRoles) throws Throwable {
         // 获取当前用户ID
-        String userId = StpUtil.getLoginIdAsString();
+        Long userId = StpUtil.getLoginIdAsLong();
         
         String[] roles = requiresRoles.value();
         if (roles.length == 0) {

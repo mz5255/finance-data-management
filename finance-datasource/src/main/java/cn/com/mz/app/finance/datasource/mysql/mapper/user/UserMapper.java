@@ -2,7 +2,7 @@ package cn.com.mz.app.finance.datasource.mysql.mapper.user;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.mapstruct.Mapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author 马震

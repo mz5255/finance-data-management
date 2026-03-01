@@ -3,6 +3,7 @@ package cn.com.mz.app.finance.datasource.mysql.entity.user.convertor;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.base.BasicUserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * @author Hollis
  */
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+@Mapper(unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface UserConvertor {
 
     UserConvertor INSTANCE = Mappers.getMapper(UserConvertor.class);
@@ -25,7 +26,7 @@ public interface UserConvertor {
      * @return
      */
     @Mapping(target = "userId", source = "request.id")
-    @Mapping(target = "createTime", source = "request.gmtCreate")
+    @Mapping(target = "createTime", source = "request.createTime")
     public UserInfo mapToVo(UserDO request);
 
     /**

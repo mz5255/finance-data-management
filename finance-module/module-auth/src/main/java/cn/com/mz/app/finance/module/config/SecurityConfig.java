@@ -39,8 +39,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 允许访问根路径和Swagger相关路径
                 .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                // 只允许访问登录和注册接口
-                .requestMatchers("/api/*/auth/login", "/api/*/auth/register").permitAll()
+                // 允许访问登录、注册和验证码接口
+                .requestMatchers("/api/*/auth/login", "/api/*/auth/register", "/api/*/auth/captchaImage","/api/*/auth/token").permitAll()
                 // 其他请求需要认证
                 .anyRequest().authenticated()
             )

@@ -21,7 +21,7 @@ public interface SysMenuMapper extends BaseMapper<SysMenuDO> {
      * @param userId 用户ID
      * @return 权限列表
      */
-    List<String> selectMenuPermsByUserId(@Param("userId") String userId);
+    List<String> selectMenuPermsByUserId(@Param("userId") Long userId);
 
     /**
      * 根据角色ID查询权限
@@ -37,7 +37,7 @@ public interface SysMenuMapper extends BaseMapper<SysMenuDO> {
      * @param userId 用户ID
      * @return 菜单列表
      */
-    List<SysMenuDO> selectMenuTreeByUserId(@Param("userId") String userId);
+    List<SysMenuDO> selectMenuTreeByUserId(@Param("userId") Long userId);
 
     /**
      * 根据角色ID查询菜单树信息

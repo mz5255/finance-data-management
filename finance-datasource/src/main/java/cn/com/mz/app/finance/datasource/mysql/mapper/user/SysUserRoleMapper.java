@@ -21,7 +21,7 @@ public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
      * @param userId 用户ID
      * @return 影响行数
      */
-    int deleteByUserId(@Param("userId") String userId);
+    int deleteByUserId(@Param("userId") Long userId);
 
     /**
      * 批量插入用户角色关联
@@ -30,5 +30,5 @@ public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
      * @param roleIds 角色ID列表
      * @return 影响行数
      */
-    int batchInsert(@Param("userId") String userId, @Param("roleIds") List<Long> roleIds);
+    int batchInsert(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds);
 }

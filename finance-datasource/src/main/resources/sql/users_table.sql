@@ -1,0 +1,25 @@
+-- 用户表
+CREATE TABLE `Users` (
+  `id` bigint NOT NULL COMMENT '用户ID',
+  `nick_name` varchar(50) DEFAULT NULL COMMENT '昵称',
+  `password_hash` varchar(255) NOT NULL COMMENT '密码哈希',
+  `salt` varchar(10) NOT NULL COMMENT '密码盐',
+  `state` varchar(20) NOT NULL COMMENT '状态',
+  `telephone` varchar(20) NOT NULL COMMENT '手机号',
+  `last_login_time` time DEFAULT NULL COMMENT '最后登录时间',
+  `profile_photo_url` varchar(255) DEFAULT NULL COMMENT '头像地址',
+  `block_chain_url` varchar(255) DEFAULT NULL COMMENT '区块链地址',
+  `block_chain_platform` varchar(50) DEFAULT NULL COMMENT '区块链平台',
+  `certification` tinyint(1) DEFAULT '0' COMMENT '实名认证',
+  `real_name` varchar(100) DEFAULT NULL COMMENT '真实姓名(AES加密)',
+  `id_card_no` varchar(100) DEFAULT NULL COMMENT '身份证号(AES加密)',
+  `user_role` varchar(20) NOT NULL COMMENT '用户角色',
+  `deleted` int DEFAULT '0' COMMENT '是否删除(0-未删除 1-已删除)',
+  `lock_version` int DEFAULT '0' COMMENT '乐观锁版本号',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_telephone` (`telephone`),
+  KEY `idx_state` (`state`),
+  KEY `idx_user_role` (`user_role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';

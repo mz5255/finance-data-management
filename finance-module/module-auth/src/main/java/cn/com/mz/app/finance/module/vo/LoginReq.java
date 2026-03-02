@@ -1,6 +1,6 @@
 package cn.com.mz.app.finance.module.vo;
 
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,8 +35,8 @@ public class LoginReq implements Serializable {
     private Long tokenExpiration;
 
 
-    public LoginReq(UserInfo userInfo) {
-        this.userId = userInfo.getUserId().toString();
+    public LoginReq(UserDTO userDTO) {
+        this.userId = userDTO.getUserId().toString();
         this.token = StpUtil.getTokenValue();
         this.tokenExpiration = StpUtil.getTokenSessionTimeout();
     }

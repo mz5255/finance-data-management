@@ -5,8 +5,7 @@ import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.common.utils.AssertUtils;
 import cn.com.mz.app.finance.common.utils.IDUtils;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
@@ -18,7 +17,6 @@ import cn.com.mz.app.finance.starter.lock.DistributeLock;
 import cn.com.mz.app.finance.starter.utils.RedisUtils;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.lang.Assert;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
@@ -238,9 +236,9 @@ public class AuthServiceImpl implements AuthService {
         //判断是注册还是登陆
         //查询用户信息
         UserQueryRequest userQueryRequest = new UserQueryRequest(loginParam.getTelephone());
-        BaseResult<UserInfo> userQueryResponse = queryMemberService.query(userQueryRequest);
-        UserInfo userInfo = userQueryResponse.getData();
-        if (userInfo == null) {
+        BaseResult<UserDTO> userQueryResponse = queryMemberService.query(userQueryRequest);
+        UserDTO userDTO = userQueryResponse.getData();
+        if (userDTO == null) {
             //需要注册
             UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
             userRegisterRequest.setTelephone(loginParam.getTelephone());
@@ -248,14 +246,14 @@ public class AuthServiceImpl implements AuthService {
             BaseResult<?> response = register(userRegisterRequest);
             if (response.isSuccess()) {
                 userQueryResponse = queryMemberService.query(userQueryRequest);
-                userInfo = userQueryResponse.getData();
-                LoginReq loginVO = getLoginReq(loginParam, userInfo);
+                userDTO = userQueryResponse.getData();
+                LoginReq loginVO = getLoginReq(loginParam, userDTO);
                 return BaseResult.success(loginVO);
             }
             return BaseResult.error(response.getCode(), response.getMessage());
         } else {
             //登录
-            LoginReq loginVO = getLoginReq(loginParam, userInfo);
+            LoginReq loginVO = getLoginReq(loginParam, userDTO);
             return BaseResult.success(loginVO);
         }
     }
@@ -264,16 +262,16 @@ public class AuthServiceImpl implements AuthService {
      * 填充用户信息至上下文中 & 更新用户最后一次登录时间
      *
      * @param loginParam
-     * @param userInfo
+     * @param userDTO
      * @return
      */
     @Transactional
-    public LoginReq getLoginReq(LoginParam loginParam, UserInfo userInfo) {
-        StpUtil.login(userInfo.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
+    public LoginReq getLoginReq(LoginParam loginParam, UserDTO userDTO) {
+        StpUtil.login(userDTO.getUserId(), new SaLoginModel().setIsLastingCookie(loginParam.getRememberMe())
                 .setTimeout(DEFAULT_LOGIN_SESSION_TIMEOUT));
-        StpUtil.getSession().set("userId", userInfo.getUserId());
-        LoginReq loginVO = new LoginReq(userInfo);
-        UserDO userDO = userService.getById(userInfo.getUserId());
+        StpUtil.getSession().set("userId", userDTO.getUserId());
+        LoginReq loginVO = new LoginReq(userDTO);
+        UserDO userDO = userService.getById(userDTO.getUserId());
         userDO.login(loginParam.getPassword());
         userService.updateById(userDO);
         return loginVO;

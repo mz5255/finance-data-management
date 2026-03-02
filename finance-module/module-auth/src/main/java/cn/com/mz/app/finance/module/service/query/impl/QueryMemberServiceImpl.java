@@ -3,15 +3,13 @@ package cn.com.mz.app.finance.module.service.query.impl;
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserConvertor;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.com.mz.app.finance.module.dto.req.QueryParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.dto.req.condition.UserIdQueryCondition;
 import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneAndPasswordQueryCondition;
 import cn.com.mz.app.finance.module.dto.req.condition.UserPhoneQueryCondition;
-import cn.com.mz.app.finance.module.dto.req.condition.UserQueryCondition;
 import cn.com.mz.app.finance.module.service.query.QueryMemberService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +28,7 @@ public class QueryMemberServiceImpl implements QueryMemberService {
     @Resource
     private UserService userService;
 
-    public BaseResult<UserInfo> getMember(QueryParam queryParam) {
+    public BaseResult<UserDTO> getMember(QueryParam queryParam) {
         if (StringUtils.isNotBlank(queryParam.getTelephone())){
             UserQueryRequest userQueryRequest = new UserQueryRequest(queryParam.getTelephone());
             return query(userQueryRequest);
@@ -43,7 +41,7 @@ public class QueryMemberServiceImpl implements QueryMemberService {
     }
 
 
-    public BaseResult<UserInfo> query(UserQueryRequest userQueryRequest) {
+    public BaseResult<UserDTO> query(UserQueryRequest userQueryRequest) {
         //使用switch表达式精简代码，如果这里编译不过，参考我的文档调整IDEA的JDK版本
         UserDO user = switch (userQueryRequest.getUserQueryCondition()) {
             case UserIdQueryCondition userIdQueryCondition:
@@ -56,10 +54,10 @@ public class QueryMemberServiceImpl implements QueryMemberService {
                 throw new BusinessException("该查询方式为被定义: " + userQueryRequest.getUserQueryCondition().getClass().getName() + "，请检查");
         };
 
-        BaseResult<UserInfo> response = new BaseResult();
+        BaseResult<UserDTO> response = new BaseResult();
         response.setCode(200);
-        UserInfo userInfo = UserConvertor.INSTANCE.mapToVo(user);
-        response.setData(userInfo);
+        UserDTO userDTO = UserDTO.build(user);
+        response.setData(userDTO);
         return response;
     }
 }

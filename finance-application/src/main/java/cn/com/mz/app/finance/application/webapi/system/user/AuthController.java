@@ -2,7 +2,7 @@ package cn.com.mz.app.finance.application.webapi.system.user;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.convertor.UserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
 import cn.com.mz.app.finance.module.dto.req.QueryParam;
 import cn.com.mz.app.finance.module.dto.req.RegisterParam;
@@ -87,7 +87,7 @@ public class AuthController {
      */
     @GetMapping("/query")
     @Operation(summary = "查询用户信息")
-    public BaseResult<UserInfo> query(@RequestBody QueryParam queryParam) {
+    public BaseResult<UserDTO> query(@RequestBody QueryParam queryParam) {
         return queryMemberService.getMember(queryParam);
     }
 

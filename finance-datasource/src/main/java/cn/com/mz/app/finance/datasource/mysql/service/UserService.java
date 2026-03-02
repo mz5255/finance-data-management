@@ -1,8 +1,10 @@
 package cn.com.mz.app.finance.datasource.mysql.service;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
 
@@ -115,4 +117,13 @@ public interface UserService {
      * @return 是否删除成功
      */
     boolean deleteById(Long id);
+
+    /**
+     * 分页查询会员列表
+     *
+     * @param page 当前页码
+     * @param size 每页大小
+     * @return 分页结果
+     */
+    IPage<UserDTO> getMembersByPage(Integer page, Integer size);
 }

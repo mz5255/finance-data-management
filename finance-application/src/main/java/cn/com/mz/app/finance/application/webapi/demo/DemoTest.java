@@ -17,17 +17,17 @@ import java.util.List;
  * @description: demo
  */
 public class DemoTest {
-    @RequiresPermissions("system:user:list")
-    @GetMapping("/list")
-    public BaseResult<List<UserDO>> getUserList() {
-        // 需要system:user:list权限才能访问
-        return BaseResult.success();
-    }
-
-    @RequiresRoles(value = {"admin", "customer"}, logical = RequiresRoles.Logical.OR)
-    @PostMapping("/delete")
-    public BaseResult<Boolean> deleteUser() {
-        // 需要admin或manager角色才能访问
-        return BaseResult.success();
-    }
+//    @RequiresPermissions("system:user:list")
+//    @GetMapping("/list")
+//    public BaseResult<List<UserDO>> getUserList() {
+//        // 需要system:user:list权限才能访问
+//        return BaseResult.success();
+//    }
+//
+//    @RequiresRoles(value = {"admin", "customer"}, logical = RequiresRoles.Logical.OR)
+//    @PostMapping("/delete")
+//    public BaseResult<Boolean> deleteUser() {
+//        // 需要admin或manager角色才能访问
+//        return BaseResult.success();
+//    }
 }

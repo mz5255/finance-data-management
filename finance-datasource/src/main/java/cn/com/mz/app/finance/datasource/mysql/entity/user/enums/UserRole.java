@@ -19,4 +19,13 @@ public enum UserRole {
      * 管理员
      */
     ADMIN;
+
+    public static UserRole getByValue(String value) {
+        for (UserRole role : UserRole.values()) {
+            if (role.name().equals(value)) {
+                return role;
+            }
+        }
+        return null;
+    }
 }

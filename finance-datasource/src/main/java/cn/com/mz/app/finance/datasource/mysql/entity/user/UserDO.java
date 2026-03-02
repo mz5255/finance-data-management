@@ -22,6 +22,7 @@ import java.util.UUID;
  * @author mz
  */
 @Getter
+@Setter
 @TableName("Users")
 public class UserDO extends BaseEntity {
     /**

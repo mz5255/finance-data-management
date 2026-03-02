@@ -14,4 +14,8 @@ public class QueryParam {
     private String telephone;
 
     private Long userId;
+
+    private Integer pageNum;
+
+    private Integer pageSize;
 }

@@ -37,12 +37,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter Security (安全) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
         <!-- Spring Boot Starter Thymeleaf (模板引擎) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

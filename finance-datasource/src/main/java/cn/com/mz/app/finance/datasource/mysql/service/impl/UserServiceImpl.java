@@ -1,14 +1,16 @@
 package cn.com.mz.app.finance.datasource.mysql.service.impl;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
-import cn.com.mz.app.finance.datasource.mysql.mapper.user.SysUserRoleMapper;
 import cn.com.mz.app.finance.datasource.mysql.mapper.user.UserMapper;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -178,5 +180,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Override
     public boolean deleteById(Long id) {
         return userMapper.deleteById(id) > 0;
+    }
+
+    /**
+     * 分页查询会员列表
+     *
+     * @param page 当前页码
+     * @param size 每页大小
+     * @return 分页结果
+     */
+    @Override
+    public IPage<UserDTO> getMembersByPage(Integer page, Integer size) {
+        // 设置默认值
+        if (page == null || page <= 0) {
+            page = 1;
+        }
+        if (size == null || size <= 0) {
+            size = 20;
+        }
+        // 创建分页对象
+        Page<UserDO> pageObj = new Page<>(page, size);
+        // 查询会员列表（用户角色为 CUSTOMER）
+        Page<UserDO> userDOPage = userMapper.selectPage(pageObj, new LambdaQueryWrapper<UserDO>());
+        List<UserDTO> userDTOS = UserDTO.build(userDOPage.getRecords());
+        Page<UserDTO> userInfoPage = new Page<>();
+        userInfoPage.setRecords(userDTOS);
+        userInfoPage.setCurrent(userDOPage.getCurrent());
+        userInfoPage.setSize(userDOPage.getSize());
+        userInfoPage.setTotal(userDOPage.getTotal());
+        return userInfoPage;
     }
 }

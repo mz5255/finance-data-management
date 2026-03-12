@@ -1,85 +1,67 @@
-package cn.com.mz.app.finance.application.webapi.system.user;
+package cn.com.mz.app.finance.application.webapi.system.permission;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysMenuDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysRoleDO;
 import cn.com.mz.app.finance.datasource.mysql.service.PermissionService;
-import cn.com.mz.app.finance.module.annotation.RequiresPermissions;
-import cn.com.mz.app.finance.module.annotation.RequiresRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
- * 权限管理Controller
+ * 用户权限Controller
+ * 处理用户相关的权限查询接口
  *
  * @author mz
  */
 @RestController
 @RequestMapping("/api/finance-data/system/permission")
-@Tag(name = "权限管理", description = "用户权限分配相关接口")
-public class PermissionController {
+@Tag(name = "用户权限", description = "用户权限查询相关接口")
+public class UserPermissionController {
 
     @Resource
     private PermissionService permissionService;
 
     /**
-     * 为用户分配角色
+     * 获取用户菜单树
      *
      * @param userId 用户ID
-     * @param roleIds 角色ID列表
-     * @return 操作结果
+     * @return 菜单树
      */
-    @PostMapping("/assignRoles")
-    @Operation(summary = "为用户分配角色")
-    @RequiresPermissions("system:user:edit")
-    public BaseResult<Boolean> assignRolesToUser(@RequestParam Long userId, @RequestBody List<Long> roleIds) {
-        boolean success = permissionService.assignRolesToUser(userId, roleIds);
-        return BaseResult.success(success);
+    @GetMapping("/getMenuTreeByUserId")
+    @Operation(summary = "获取用户菜单树")
+    public BaseResult<List<SysMenuDO>> getMenuTreeByUserId(@RequestParam Long userId) {
+        List<SysMenuDO> menuTree = permissionService.getMenuTreeByUserId(userId);
+        return BaseResult.success(menuTree);
     }
 
     /**
-     * 为角色分配菜单权限
-     *
-     * @param roleId 角色ID
-     * @param menuIds 菜单ID列表
-     * @return 操作结果
-     */
-    @PostMapping("/assignMenus")
-    @Operation(summary = "为角色分配菜单权限")
-    @RequiresRoles("admin")
-    public BaseResult<Boolean> assignMenusToRole(@RequestParam Long roleId, @RequestBody List<Long> menuIds) {
-        boolean success = permissionService.assignMenusToRole(roleId, menuIds);
-        return BaseResult.success(success);
-    }
-
-    /**
-     * 获取用户的角色列表
+     * 获取用户角色列表
      *
      * @param userId 用户ID
      * @return 角色列表
      */
     @GetMapping("/userRoles/{userId}")
-    @Operation(summary = "获取用户角色")
-    @RequiresPermissions("system:user:query")
+    @Operation(summary = "获取用户角色列表")
     public BaseResult<List<String>> getUserRoles(@PathVariable Long userId) {
-        var roles = permissionService.getRolePermission(userId);
+        Set<String> roles = permissionService.getRolePermission(userId);
         return BaseResult.success(roles.stream().toList());
     }
 
     /**
-     * 获取用户的权限列表
+     * 获取用户权限列表
      *
      * @param userId 用户ID
      * @return 权限列表
      */
     @GetMapping("/userPermissions/{userId}")
-    @Operation(summary = "获取用户权限")
-    @RequiresPermissions("system:user:query")
+    @Operation(summary = "获取用户权限列表")
     public BaseResult<List<String>> getUserPermissions(@PathVariable Long userId) {
-        var permissions = permissionService.getMenuPermission(userId);
+        Set<String> permissions = permissionService.getMenuPermission(userId);
         return BaseResult.success(permissions.stream().toList());
     }
 
@@ -112,15 +94,16 @@ public class PermissionController {
     }
 
     /**
-     * 获取用户所有菜单
+     * 为用户分配角色
      *
      * @param userId 用户ID
-     * @return 是否有角色
+     * @param roleIds 角色ID列表
+     * @return 操作结果
      */
-    @GetMapping("/getMenuTreeByUserId")
-    @Operation(summary = "获取用户所有菜单")
-    public BaseResult<?> getMenuTreeByUserId(@RequestParam Long userId) {
-        List<SysMenuDO> menuTreeByUserId = permissionService.getMenuTreeByUserId(userId);
-        return BaseResult.success(menuTreeByUserId);
+    @PostMapping("/assignRoles")
+    @Operation(summary = "为用户分配角色")
+    public BaseResult<Boolean> assignRoles(@RequestParam Long userId, @RequestBody List<Long> roleIds) {
+        boolean success = permissionService.assignRolesToUser(userId, roleIds);
+        return BaseResult.success(success);
     }
 }

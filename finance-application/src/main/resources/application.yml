@@ -7,6 +7,16 @@ spring:
     user:
       name: admin
       password: 123456
+  # Jackson 配置
+  jackson:
+    # 支持 Java 8 日期时间类型
+    serialization:
+      write-dates-as-timestamps: false
+    # 将 Long 类型序列化为 String，避免 JavaScript 精度丢失
+    default-property-inclusion: non_null
+    generator:
+      write-numbers-as-strings: true
+
 server:
   port: 58888
 

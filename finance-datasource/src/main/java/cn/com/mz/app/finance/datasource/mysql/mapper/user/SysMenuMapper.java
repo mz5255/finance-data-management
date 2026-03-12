@@ -46,4 +46,20 @@ public interface SysMenuMapper extends BaseMapper<SysMenuDO> {
      * @return 选中菜单列表
      */
     List<Long> selectMenuListByRoleId(@Param("roleId") Long roleId);
+
+    /**
+     * 检查是否有子菜单
+     *
+     * @param menuId 菜单ID
+     * @return 是否有子菜单
+     */
+    boolean hasChildByMenuId(@Param("menuId") Long menuId);
+
+    /**
+     * 查询子菜单列表
+     *
+     * @param menuId 父菜单ID
+     * @return 子菜单列表
+     */
+    List<SysMenuDO> selectChildrenByMenuId(@Param("menuId") Long menuId);
 }

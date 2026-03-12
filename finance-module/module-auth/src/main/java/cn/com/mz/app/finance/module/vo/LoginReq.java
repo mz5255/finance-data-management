@@ -21,7 +21,7 @@ public class LoginReq implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户标识，如用户ID
+     * 用户标识，如用户ID（使用String类型避免JavaScript精度丢失问题）
      */
     private String userId;
     /**
@@ -36,6 +36,7 @@ public class LoginReq implements Serializable {
 
 
     public LoginReq(UserDTO userDTO) {
+        // 将Long类型的userId转换为String，避免JavaScript精度丢失
         this.userId = userDTO.getUserId().toString();
         this.token = StpUtil.getTokenValue();
         this.tokenExpiration = StpUtil.getTokenSessionTimeout();

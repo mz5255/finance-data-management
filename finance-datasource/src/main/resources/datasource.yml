@@ -18,12 +18,14 @@ spring:
       log-abandoned: true    # 打印 SQL 异常信息
       remove-abandoned: true # 丢弃异常连接
 
-  mybatis-plus:
-    mapper-locations: classpath:/mappers/**/*.xml
-    type-aliases-package: cn.com.mz.app.finance.datasource.entity  # 配置实体类所在包
-    global-config:
-      db-config:
-        id-type: auto      # 主键生成策略
-        field-strategy: not_empty  # 字段策略
-    configuration:
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 输出 SQL 日志
+# mybatis-plus 配置应该是顶层配置，不是 spring 的子配置
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/**/*.xml
+  type-aliases-package: cn.com.mz.app.finance.datasource.mysql.entity  # 配置实体类所在包
+  global-config:
+    db-config:
+      id-type: auto      # 主键生成策略
+      field-strategy: not_empty  # 字段策略
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 输出 SQL 日志
+    map-underscore-to-camel-case: true  # 开启驼峰命名转换

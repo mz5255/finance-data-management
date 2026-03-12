@@ -44,4 +44,20 @@
         WHERE rm.role_id = #{roleId}
     </select>
 
+    <select id="hasChildByMenuId" resultType="boolean">
+        SELECT COUNT(1) > 0
+        FROM sys_menu
+        WHERE parent_id = #{menuId}
+    </select>
+
+    <select id="selectChildrenByMenuId" resultType="cn.com.mz.app.finance.datasource.mysql.entity.permission.SysMenuDO">
+        SELECT menu_id, menu_name, parent_id, order_num, path,
+               component, query, is_frame, is_cache, menu_type,
+               visible, status, perms, icon, create_by, create_time,
+               update_by, update_time, remark
+        FROM sys_menu
+        WHERE parent_id = #{menuId}
+        ORDER BY order_num
+    </select>
+
 </mapper>

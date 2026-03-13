@@ -91,4 +91,33 @@ public class RoleService {
     public SysRoleDO checkRoleKeyUnique(String roleKey) {
         return roleMapper.checkRoleKeyUnique(roleKey);
     }
+
+    /**
+     * 根据角色标识获取角色
+     *
+     * @param roleKey 角色标识
+     * @return 角色信息
+     */
+    public SysRoleDO getRoleByKey(String roleKey) {
+        return roleMapper.selectOne(
+                new LambdaQueryWrapper<SysRoleDO>()
+                        .eq(SysRoleDO::getRoleKey, roleKey)
+                        .eq(SysRoleDO::getDelFlag, "0")
+        );
+    }
+
+    /**
+     * 获取所有角色映射 (roleKey -> roleName)
+     *
+     * @return 角色映射
+     */
+    public java.util.Map<String, String> getRoleNameMap() {
+        List<SysRoleDO> roleList = getRoleList();
+        return roleList.stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        SysRoleDO::getRoleKey,
+                        SysRoleDO::getRoleName,
+                        (existing, replacement) -> existing
+                ));
+    }
 }

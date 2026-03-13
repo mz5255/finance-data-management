@@ -43,13 +43,13 @@ public class UserPermissionController {
      * 获取用户角色列表
      *
      * @param userId 用户ID
-     * @return 角色列表
+     * @return 角色列表（包含完整角色信息）
      */
     @GetMapping("/userRoles/{userId}")
     @Operation(summary = "获取用户角色列表")
-    public BaseResult<List<String>> getUserRoles(@PathVariable Long userId) {
-        Set<String> roles = permissionService.getRolePermission(userId);
-        return BaseResult.success(roles.stream().toList());
+    public BaseResult<List<SysRoleDO>> getUserRoles(@PathVariable Long userId) {
+        List<SysRoleDO> roles = permissionService.getRolesByUserId(userId);
+        return BaseResult.success(roles);
     }
 
     /**

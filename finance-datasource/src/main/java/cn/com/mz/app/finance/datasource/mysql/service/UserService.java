@@ -2,7 +2,6 @@ package cn.com.mz.app.finance.datasource.mysql.service;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -45,7 +44,7 @@ public interface UserService {
      * @param userRole 用户角色
      * @return 用户列表
      */
-    List<UserDO> getByUserRole(UserRole userRole);
+    List<UserDO> getByUserRole(String userRole);
 
     /**
      * 根据邀请人ID查询被邀请用户列表
@@ -126,4 +125,23 @@ public interface UserService {
      * @return 分页结果
      */
     IPage<UserDTO> getMembersByPage(Integer page, Integer size);
+
+    /**
+     * 分页查询所有用户列表（包括冻结用户，用于管理后台）
+     *
+     * @param page 当前页码
+     * @param size 每页大小
+     * @return 分页结果
+     */
+    IPage<UserDTO> getAllUsersByPage(Integer page, Integer size);
+
+    /**
+     * 更新用户个人信息
+     *
+     * @param userId    用户ID
+     * @param nickName  昵称
+     * @param telephone 手机号
+     * @return 是否更新成功
+     */
+    boolean updateProfile(Long userId, String nickName, String telephone);
 }

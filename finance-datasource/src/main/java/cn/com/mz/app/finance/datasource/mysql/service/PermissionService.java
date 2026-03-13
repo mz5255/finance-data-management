@@ -35,16 +35,26 @@ public class PermissionService {
     private SysRoleMenuMapper roleMenuMapper;
 
     /**
-     * 获取用户角色权限
+     * 获取用户角色权限（返回角色标识）
      *
      * @param userId 用户ID
-     * @return 角色权限集合
+     * @return 角色标识集合
      */
     public Set<String> getRolePermission(Long userId) {
         List<SysRoleDO> roles = roleMapper.selectRolesByUserId(userId);
         return roles.stream()
                 .map(SysRoleDO::getRoleKey)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * 获取用户的角色列表（完整对象）
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    public List<SysRoleDO> getRolesByUserId(Long userId) {
+        return roleMapper.selectRolesByUserId(userId);
     }
 
     /**

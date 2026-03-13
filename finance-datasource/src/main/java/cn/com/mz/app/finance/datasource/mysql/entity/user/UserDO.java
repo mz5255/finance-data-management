@@ -3,7 +3,6 @@ package cn.com.mz.app.finance.datasource.mysql.entity.user;
 import cn.com.mz.app.finance.common.exceptions.BusinessException;
 import cn.com.mz.app.finance.datasource.mysql.entity.base.BaseEntity;
 import cn.com.mz.app.finance.datasource.mysql.entity.handler.AesEncryptTypeHandler;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -91,24 +90,20 @@ public class UserDO extends BaseEntity {
     /**
      * 用户角色
      */
-    private UserRole userRole;
+    private String userRole;
+
+    public static String getPassword(String password, String salt) {
+        return DigestUtil.md5Hex(password + salt, StandardCharsets.UTF_8);
+    }
 
     public UserDO register(Long userId, String telephone, String password) {
         this.setId(userId);
         this.telephone = telephone;
         this.nickName = nickName;
         this.salt = UUID.randomUUID().toString().substring(0, 4);
-        this.passwordHash = DigestUtil.md5Hex(password + salt, StandardCharsets.UTF_8);
+        this.passwordHash = getPassword(password, salt);
         this.state = UserStateEnum.INIT;
-        this.userRole = UserRole.CUSTOMER;
-        return this;
-    }
-
-    public UserDO registerAdmin(String telephone, String nickName, String password) {
-        this.telephone = telephone;
-        this.nickName = nickName;
-        this.passwordHash = DigestUtil.md5Hex(password);
-        this.userRole = UserRole.ADMIN;
+        this.userRole = "customer";
         return this;
     }
 
@@ -126,14 +121,21 @@ public class UserDO extends BaseEntity {
         return this;
     }
 
+    public UserDO registerAdmin(String telephone, String nickName, String password) {
+        this.telephone = telephone;
+        this.nickName = nickName;
+        this.passwordHash = getPassword(password, salt);
+        this.userRole = "admin";
+        return this;
+    }
+
     public void login(String password) {
         this.lastLoginTime = LocalTime.now();
-        password = DigestUtil.md5Hex(password + salt, StandardCharsets.UTF_8);
+        password = getPassword(password, salt);
         if (!password.equals(this.passwordHash)) {
             throw new BusinessException("密码错误");
         }
     }
-
     public boolean canModifyInfo() {
         return state == UserStateEnum.INIT || state == UserStateEnum.AUTH;
     }

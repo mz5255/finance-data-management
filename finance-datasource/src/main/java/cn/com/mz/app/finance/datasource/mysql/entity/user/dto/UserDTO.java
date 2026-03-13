@@ -1,16 +1,14 @@
 package cn.com.mz.app.finance.datasource.mysql.entity.user.dto;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.base.BasicUserInfo;
+import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import com.github.houbb.sensitive.annotation.strategy.SensitiveStrategyPhone;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,7 +42,12 @@ public class UserDTO extends BasicUserInfo {
     /**
      * 用户角色
      */
-    private UserRole userRole;
+    private String userRole;
+
+    /**
+     * 角色名称
+     */
+    private String roleName;
 
     /**
      * 注册时间
@@ -55,18 +58,6 @@ public class UserDTO extends BasicUserInfo {
      * 密码盐
      */
     private String salt;
-
-    public boolean userCanBuy() {
-
-        if (this.getUserRole() != null && !this.getUserRole().equals(UserRole.CUSTOMER)) {
-            return false;
-        }
-        //是否实名认证
-        if (this.getState() != null && !this.getCertification()) {
-            return false;
-        }
-        return true;
-    }
 
     public static UserDO build(UserDTO userDTO) {
         UserDO userDO = new UserDO();
@@ -91,6 +82,7 @@ public class UserDTO extends BasicUserInfo {
         userDTO.setUserRole(userDO.getUserRole());
         userDTO.setProfilePhotoUrl(userDO.getProfilePhotoUrl());
         userDTO.setSalt(userDO.getSalt());
+        userDTO.setCreateTime(userDO.getCreateTime());
         return userDTO;
     }
 

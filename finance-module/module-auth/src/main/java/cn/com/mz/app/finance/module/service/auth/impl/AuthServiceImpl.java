@@ -6,8 +6,10 @@ import cn.com.mz.app.finance.common.utils.AssertUtils;
 import cn.com.mz.app.finance.common.utils.IDUtils;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
+import cn.com.mz.app.finance.datasource.mysql.service.PermissionService;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
+import cn.com.mz.app.finance.module.dto.req.UpdateParam;
 import cn.com.mz.app.finance.module.dto.req.UserQueryRequest;
 import cn.com.mz.app.finance.module.service.auth.AuthService;
 import cn.com.mz.app.finance.module.service.query.QueryMemberService;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.image.BufferedImage;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static cn.com.mz.app.finance.starter.constant.CacheConstant.CAPTCHA_KEY_PREFIX;
@@ -58,12 +61,15 @@ public class AuthServiceImpl implements AuthService {
     private QueryMemberService queryMemberService;
     @Resource
     private RedisUtils redisUtils;
+    private static final Long DEFAULT_ROLE_ID = 2L; // 默认分配角色
 
     private static final String ROOT_CAPTCHA = "5255";
     /**
      * 默认登录超时时间：7天
      */
     private static final Integer DEFAULT_LOGIN_SESSION_TIMEOUT = 60 * 60 * 24 * 7;
+    @Resource
+    private PermissionService permissionService;
     /**
      * 用户id布隆过滤器
      */
@@ -105,6 +111,9 @@ public class AuthServiceImpl implements AuthService {
 
         addUserId(userId);
         updateUserCache(user.getId(), user);
+
+        // 自动分配默认角色（普通角色）
+        permissionService.assignRolesToUser(userId, List.of(DEFAULT_ROLE_ID));
 
         return BaseResult.success(user);
     }
@@ -220,6 +229,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
+     * 注册后自动登录（无需验证码校验）
+     *
+     * @param loginParam
+     * @return
+     */
+    @Transactional
+    public BaseResult<LoginReq> loginAfterRegister(LoginParam loginParam) {
+        //查询用户信息
+        UserQueryRequest userQueryRequest = new UserQueryRequest(loginParam.getTelephone());
+        BaseResult<UserDTO> userQueryResponse = queryMemberService.query(userQueryRequest);
+        UserDTO userDTO = userQueryResponse.getData();
+        if (userDTO == null) {
+            return BaseResult.error("用户不存在");
+        }
+        //执行登录
+        LoginReq loginVO = getLoginReq(loginParam, userDTO);
+        return BaseResult.success(loginVO);
+    }
+
+    /**
      * 登录
      *
      * @param loginParam
@@ -275,5 +304,47 @@ public class AuthServiceImpl implements AuthService {
         userDO.login(loginParam.getPassword());
         userService.updateById(userDO);
         return loginVO;
+    }
+
+    /**
+     * 修改密码
+     *
+     * @return 是否修改成功
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean changePassword(UpdateParam updateParam) {
+        // 获取当前登录用户ID
+        Object loginId = StpUtil.getLoginIdDefaultNull();
+        if (loginId == null) {
+            throw new BusinessException("用户未登录");
+        }
+
+        Long userId = Long.valueOf(loginId.toString());
+
+        // 查询用户信息
+        UserDO user = userService.getById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 验证原密码
+        String oldPasswordHash = UserDO.getPassword(updateParam.getOldPassword(), user.getSalt());
+        if (!oldPasswordHash.equals(user.getPasswordHash())) {
+            throw new BusinessException("原密码不正确");
+        }
+        // 更新为新密码
+        user.setPasswordHash(UserDO.getPassword(updateParam.getNewPassword(), user.getSalt()));
+
+        boolean success = userService.updateById(user);
+
+        if (success) {
+            // 清除用户缓存
+            updateUserCache(userId, user);
+            // 强制退出登录
+            StpUtil.logout(userId);
+        }
+
+        return success;
     }
 }

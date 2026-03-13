@@ -1,13 +1,15 @@
 package cn.com.mz.app.finance.datasource.mysql.service;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysMenuDO;
+import cn.com.mz.app.finance.datasource.mysql.entity.permission.SysRoleDO;
 import cn.com.mz.app.finance.datasource.mysql.mapper.user.SysMenuMapper;
+import cn.com.mz.app.finance.datasource.mysql.mapper.user.SysRoleMenuMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +21,19 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
 
+    /**
+     * 超级管理员角色标识
+     */
+    private static final String SUPER_ADMIN_ROLE_KEY = "admin";
+
     @Resource
     private SysMenuMapper menuMapper;
+
+    @Resource
+    private SysRoleMenuMapper roleMenuMapper;
+
+    @Resource
+    private RoleService roleService;
 
     /**
      * 获取所有菜单列表
@@ -117,22 +130,36 @@ public class MenuService {
 
     /**
      * 创建菜单
+     * 创建后自动分配给超级管理员
      *
      * @param menu 菜单信息
      * @return 是否成功
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean createMenu(SysMenuDO menu) {
-        return menuMapper.insert(menu) > 0;
+        boolean success = menuMapper.insert(menu) > 0;
+        if (success) {
+            // 自动分配给超级管理员
+            assignMenuToSuperAdmin(menu.getMenuId());
+        }
+        return success;
     }
 
     /**
      * 更新菜单
+     * 更新后确保超级管理员拥有该菜单权限
      *
      * @param menu 菜单信息
      * @return 是否成功
      */
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateMenu(SysMenuDO menu) {
-        return menuMapper.updateById(menu) > 0;
+        boolean success = menuMapper.updateById(menu) > 0;
+        if (success) {
+            // 确保超级管理员拥有该菜单权限
+            assignMenuToSuperAdmin(menu.getMenuId());
+        }
+        return success;
     }
 
     /**
@@ -163,5 +190,28 @@ public class MenuService {
      */
     public List<Long> getMenuIdsByRoleId(Long roleId) {
         return menuMapper.selectMenuListByRoleId(roleId);
+    }
+
+    /**
+     * 将菜单分配给超级管理员
+     * 超级管理员默认拥有所有菜单权限
+     *
+     * @param menuId 菜单ID
+     */
+    private void assignMenuToSuperAdmin(Long menuId) {
+        // 获取超级管理员角色
+        SysRoleDO superAdminRole = roleService.getRoleByKey(SUPER_ADMIN_ROLE_KEY);
+        if (superAdminRole == null) {
+            throw new RuntimeException("超级管理员角色不存在，请检查系统初始化数据");
+        }
+
+        Long superAdminRoleId = superAdminRole.getRoleId();
+
+        // 检查超级管理员是否已拥有该菜单权限
+        List<Long> adminMenuIds = getMenuIdsByRoleId(superAdminRoleId);
+        if (!adminMenuIds.contains(menuId)) {
+            // 批量插入角色菜单关联（单个菜单）
+            roleMenuMapper.batchInsert(superAdminRoleId, List.of(menuId));
+        }
     }
 }

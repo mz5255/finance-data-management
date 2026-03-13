@@ -32,6 +32,14 @@ public class BaseResult<T> {
         return new BaseResult<>(code, msg);
     }
 
+    public static <T> BaseResult<T> error(String msg) {
+        BaseResult<T> objectBaseResult = new BaseResult<>();
+        objectBaseResult.setCode(400);
+        objectBaseResult.setMessage(msg);
+        objectBaseResult.setData(null);
+        return objectBaseResult;
+    }
+
     public boolean isSuccess() {
         return this.code == 200;
     }

@@ -2,6 +2,7 @@ package cn.com.mz.app.finance.module.service.auth;
 
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
 import cn.com.mz.app.finance.module.dto.req.LoginParam;
+import cn.com.mz.app.finance.module.dto.req.UpdateParam;
 import cn.com.mz.app.finance.module.vo.LoginReq;
 import cn.com.mz.app.finance.module.vo.UserRegisterRequest;
 
@@ -23,4 +24,19 @@ public interface AuthService {
     void captchaImage(String captchaKey);
 
     BaseResult<LoginReq> login(LoginParam loginParam);
+
+    /**
+     * 注册后自动登录
+     *
+     * @param loginParam
+     * @return
+     */
+    BaseResult<LoginReq> loginAfterRegister(LoginParam loginParam);
+
+    /**
+     * 修改密码
+     *
+     * @return 是否修改成功
+     */
+    boolean changePassword(UpdateParam params);
 }

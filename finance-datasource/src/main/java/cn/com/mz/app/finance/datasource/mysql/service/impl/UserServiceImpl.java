@@ -2,9 +2,9 @@ package cn.com.mz.app.finance.datasource.mysql.service.impl;
 
 import cn.com.mz.app.finance.datasource.mysql.entity.user.UserDO;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.dto.UserDTO;
-import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserRole;
 import cn.com.mz.app.finance.datasource.mysql.entity.user.enums.UserStateEnum;
 import cn.com.mz.app.finance.datasource.mysql.mapper.user.UserMapper;
+import cn.com.mz.app.finance.datasource.mysql.service.RoleService;
 import cn.com.mz.app.finance.datasource.mysql.service.UserService;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户服务实现类
@@ -28,6 +29,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private RoleService roleService;
 
     /**
      * 根据手机号查询用户
@@ -66,7 +70,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      * @return 用户列表
      */
     @Override
-    public List<UserDO> getByUserRole(UserRole userRole) {
+    public List<UserDO> getByUserRole(String userRole) {
         return userMapper.selectList(new LambdaQueryWrapper<UserDO>()
                 .eq(UserDO::getUserRole, userRole));
     }
@@ -183,7 +187,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     }
 
     /**
-     * 分页查询会员列表
+     * 分页查询会员列表（仅查询正常状态的用户：INIT | AUTH）
      *
      * @param page 当前页码
      * @param size 每页大小
@@ -200,14 +204,95 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
         // 创建分页对象
         Page<UserDO> pageObj = new Page<>(page, size);
-        // 查询会员列表（用户角色为 CUSTOMER）
-        Page<UserDO> userDOPage = userMapper.selectPage(pageObj, new LambdaQueryWrapper<UserDO>());
+        // 查询会员列表（仅查询状态为 INIT 或 AUTH 的用户）
+        Page<UserDO> userDOPage = userMapper.selectPage(pageObj,
+                new LambdaQueryWrapper<UserDO>()
+                        .in(UserDO::getState, UserStateEnum.INIT, UserStateEnum.AUTH)
+                        .orderByDesc(UserDO::getCreateTime));
         List<UserDTO> userDTOS = UserDTO.build(userDOPage.getRecords());
+        // 填充角色名称
+        fillRoleNames(userDTOS);
         Page<UserDTO> userInfoPage = new Page<>();
         userInfoPage.setRecords(userDTOS);
         userInfoPage.setCurrent(userDOPage.getCurrent());
         userInfoPage.setSize(userDOPage.getSize());
         userInfoPage.setTotal(userDOPage.getTotal());
         return userInfoPage;
+    }
+
+    /**
+     * 分页查询所有用户列表（包括冻结用户，用于管理后台）
+     *
+     * @param page 当前页码
+     * @param size 每页大小
+     * @return 分页结果
+     */
+    public IPage<UserDTO> getAllUsersByPage(Integer page, Integer size) {
+        // 设置默认值
+        if (page == null || page <= 0) {
+            page = 1;
+        }
+        if (size == null || size <= 0) {
+            size = 20;
+        }
+        // 创建分页对象
+        Page<UserDO> pageObj = new Page<>(page, size);
+        // 查询所有用户列表（包括所有状态）
+        Page<UserDO> userDOPage = userMapper.selectPage(pageObj,
+                new LambdaQueryWrapper<UserDO>()
+                        .orderByDesc(UserDO::getCreateTime));
+        List<UserDTO> userDTOS = UserDTO.build(userDOPage.getRecords());
+        // 填充角色名称
+        fillRoleNames(userDTOS);
+        Page<UserDTO> userInfoPage = new Page<>();
+        userInfoPage.setRecords(userDTOS);
+        userInfoPage.setCurrent(userDOPage.getCurrent());
+        userInfoPage.setSize(userDOPage.getSize());
+        userInfoPage.setTotal(userDOPage.getTotal());
+        return userInfoPage;
+    }
+
+    /**
+     * 填充用户列表的角色名称
+     *
+     * @param userDTOS 用户列表
+     */
+    private void fillRoleNames(List<UserDTO> userDTOS) {
+        if (userDTOS == null || userDTOS.isEmpty()) {
+            return;
+        }
+        // 获取角色映射
+        Map<String, String> roleNameMap = roleService.getRoleNameMap();
+        // 填充角色名称
+        userDTOS.forEach(userDTO -> {
+            if (userDTO.getUserRole() != null) {
+                userDTO.setRoleName(roleNameMap.get(userDTO.getUserRole()));
+            }
+        });
+    }
+
+    /**
+     * 更新用户个人信息
+     *
+     * @param userId    用户ID
+     * @param nickName  昵称
+     * @param telephone 手机号
+     * @return 是否更新成功
+     */
+    @Override
+    public boolean updateProfile(Long userId, String nickName, String telephone) {
+        // 检查手机号是否被其他用户使用
+        if (telephone != null && !telephone.isEmpty()) {
+            UserDO existingUser = getByTelephone(telephone);
+            if (existingUser != null && !existingUser.getId().equals(userId)) {
+                throw new IllegalArgumentException("该手机号已被其他用户使用");
+            }
+        }
+
+        // 更新用户信息
+        return userMapper.update(null, new LambdaUpdateWrapper<UserDO>()
+                .eq(UserDO::getId, userId)
+                .set(nickName != null && !nickName.isEmpty(), UserDO::getNickName, nickName)
+                .set(telephone != null && !telephone.isEmpty(), UserDO::getTelephone, telephone)) > 0;
     }
 }

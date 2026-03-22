@@ -1,0 +1,103 @@
+# ============================================================
+# AI Agent 智能体框架配置文件
+# ============================================================
+
+ai:
+  # 默认使用的模型ID
+  default-model: zhipu
+  # 默认使用的 Agent 类型
+  default-agent: chat
+
+  # ==================== 模型配置 ====================
+  models:
+    zhipu:
+      enabled: true
+      api-key: ${API.KEY.ZHIPU}
+      model: glm-5
+      base-url: https://open.bigmodel.cn/api/paas/v4
+      max-tokens: 4096
+      temperature: 0.7
+      timeout: 30000
+      retry-times: 3
+    claude:
+      enabled: false
+      api-key: ${ANTHROPIC_API_KEY:}
+      model: claude-sonnet-4-6
+      base-url: https://api.anthropic.com
+      max-tokens: 8192
+
+  # ==================== Agent 配置 ====================
+  agents:
+    chat:
+      model: zhipu
+      tools: [search, calculator]
+      max-context-rounds: 20
+      system-prompt: |
+        你是一个智能助手，能够帮助用户解答问题。
+        请用清晰、准确的语言回答用户的问题。
+    code:
+      model: zhipu
+      tools: [file_reader, file_writer, code_search]
+      max-context-rounds: 20
+      system-prompt: |
+        你是一个专业的代码助手，熟悉 Java 和 Vue 开发。
+        你可以分析代码、生成代码、编写测试用例。
+    data:
+      model: zhipu
+      tools: [database_query, calculator, chart_generator]
+      max-context-rounds: 20
+      system-prompt: |
+        你是一个专业的财务数据分析助手。
+        你可以查询分析财务数据、生成报表。
+
+  # ==================== 工具配置 ====================
+  tools:
+    file_reader:
+      enabled: true
+      project-root: ${PROJECT_ROOT:./}
+      allowed-extensions: [.java, .xml, .yml, .properties, .vue, .js, .ts, .md, .json]
+      max-file-size: 1048576
+    file_writer:
+      enabled: true
+      require-confirmation: false
+      allowed-directories: []
+      project-root: ${PROJECT_ROOT:./}
+
+  # ==================== 记忆配置 ====================
+  memory:
+    short-term:
+      max-messages: 20
+      expire-minutes: 60
+    vector:
+      enabled: true
+      embedding-model: zhipu-embedding-3
+      similarity-threshold: 0.7
+      top-k: 5
+    compaction:
+      enabled: true
+      strategy: summary
+      max-tokens: 4000
+      target-ratio: 0.3
+
+  # ==================== 安全配置 ====================
+  security:
+    prompt-injection-check: true
+    sensitive-data-check: true
+    sensitive-patterns: [phone, id_card, bank_card, email, password, api_key]
+    rate-limit:
+      enabled: true
+      requests-per-minute: 20
+      tokens-per-day: 100000
+
+  # ==================== 并发配置 ====================
+  concurrency:
+    max-requests: 3
+    queue-size: 10
+    timeout-seconds: 300
+
+# ============================================================
+# 环境变量（开发环境使用）
+# ============================================================
+API:
+  KEY:
+    ZHIPU: 720078d070634df08e25c57acb005887.RguGPV6tCxt4Mmku

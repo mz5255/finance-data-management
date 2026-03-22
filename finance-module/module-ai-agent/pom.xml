@@ -21,10 +21,17 @@
     </properties>
 
     <dependencies>
-        <!-- 公共模块 -->
+        <!-- 数据源模块 -->
         <dependency>
-            <groupId>cn.com.mz.app.finance.common</groupId>
-            <artifactId>finance-common</artifactId>
+            <groupId>cn.com.mz.app</groupId>
+            <artifactId>finance-datasource</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
+
+        <!-- Sa-Token 认证 -->
+        <dependency>
+            <groupId>cn.com.mz.app</groupId>
+            <artifactId>sa-token-starter</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
 
@@ -73,6 +80,32 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- ==================== 测试依赖 ==================== -->
+
+        <!-- Spring Boot Test (包含 JUnit 5, Mockito, AssertJ 等) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Reactor Test (响应式测试支持) -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito (Mock 框架，已包含在 spring-boot-starter-test 中) -->
+        <!-- 如果需要独立使用最新版本，可取消注释
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        -->
     </dependencies>
 
 </project>

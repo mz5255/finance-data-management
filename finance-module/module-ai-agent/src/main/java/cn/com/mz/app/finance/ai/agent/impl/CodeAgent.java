@@ -8,6 +8,7 @@ import cn.com.mz.app.finance.ai.service.ModelService;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 代码助手 Agent 实现
@@ -51,6 +52,9 @@ public class CodeAgent extends BaseAgent {
         String convId = conversationService.getOrCreateConversation(conversationId, "code");
         conversationService.addMessage(convId, "USER", message);
 
+        // 用于累积 AI 回复内容
+        AtomicReference<StringBuilder> contentAccumulator = new AtomicReference<>(new StringBuilder());
+
         return modelService.chatStream(
                         convId,
                         message,
@@ -58,6 +62,27 @@ public class CodeAgent extends BaseAgent {
                         availableTools,
                         config
                 )
-                .doOnNext(response -> response.setConversationId(convId));
+                .doOnNext(response -> {
+                    response.setConversationId(convId);
+                    // 累积内容
+                    if (response.getContent() != null) {
+                        contentAccumulator.get().append(response.getContent());
+                    }
+                })
+                .doOnComplete(() -> {
+                    // 流式完成后，保存 AI 的完整回复
+                    String fullContent = contentAccumulator.get().toString();
+                    if (!fullContent.isEmpty()) {
+                        conversationService.addMessage(convId, "ASSISTANT", fullContent);
+                    }
+                })
+                .doOnError(error -> {
+                    // 发生错误时也保存已累积的内容
+                    String partialContent = contentAccumulator.get().toString();
+                    if (!partialContent.isEmpty()) {
+                        conversationService.addMessage(convId, "ASSISTANT",
+                                partialContent + "\n\n[错误: 响应被中断]");
+                    }
+                });
     }
 }

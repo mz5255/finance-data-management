@@ -113,10 +113,15 @@ public class AuthController {
     @GetMapping("/validate")
     @Operation(summary = "验证Token是否有效")
     public BaseResult<Boolean> validateToken() {
-        // Sa-Token 会自动验证请求头中的 token
-        // 如果 token 无效，全局异常处理器会返回 401
-        boolean isLogin = StpUtil.isLogin();
-        return BaseResult.success(isLogin);
+        // 注意：这个接口不应该在 token 无效时抛出 401 异常
+        // 而是返回 code=200, data=false，让前端自己处理
+        try {
+            boolean isLogin = StpUtil.isLogin();
+            return BaseResult.success(isLogin);
+        } catch (Exception e) {
+            // token 无效或已过期，返回 false 而不是抛出异常
+            return BaseResult.success(false);
+        }
     }
 
     /**

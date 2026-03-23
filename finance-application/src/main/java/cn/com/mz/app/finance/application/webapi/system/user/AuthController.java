@@ -107,6 +107,19 @@ public class AuthController {
     }
 
     /**
+     * 验证 Token 是否有效
+     * @return 验证结果
+     */
+    @GetMapping("/validate")
+    @Operation(summary = "验证Token是否有效")
+    public BaseResult<Boolean> validateToken() {
+        // Sa-Token 会自动验证请求头中的 token
+        // 如果 token 无效，全局异常处理器会返回 401
+        boolean isLogin = StpUtil.isLogin();
+        return BaseResult.success(isLogin);
+    }
+
+    /**
      * 修改密码
      */
     @PostMapping("/changePassword")

@@ -5,6 +5,7 @@ import cn.com.mz.app.finance.ai.model.LlmModel;
 import cn.com.mz.app.finance.ai.model.ModelFactory;
 import cn.com.mz.app.finance.ai.module.AiModuleConfig;
 import cn.com.mz.app.finance.ai.service.ModelService;
+import cn.com.mz.app.finance.ai.service.file.AiFileProcessService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,30 @@ public class ModelServiceImpl implements ModelService {
 
         log.debug("Chat stream request - conversationId: {}, model: {}", conversationId, modelId);
         return model.chatStream(conversationId, message, systemPrompt, availableTools, config);
+    }
+
+    @Override
+    public Flux<ChatResponse> chatStreamWithImages(String conversationId, String message,
+                                                   List<AiFileProcessService.ImageData> images,
+                                                   String systemPrompt, List<String> availableTools,
+                                                   AiModuleConfig config) {
+        // 对于图片，优先使用视觉模型
+        String modelId = config.getModelId() != null ? config.getModelId() : "zhipu";
+        LlmModel model = modelFactory.getModel(modelId);
+
+        log.debug("Chat stream with images - conversationId: {}, model: {}, images: {}",
+                conversationId, modelId, images != null ? images.size() : 0);
+
+        // 转换图片类型并调用多模态方法
+        List<LlmModel.ImageContent> imageContents = null;
+        if (images != null && !images.isEmpty()) {
+            imageContents = images.stream()
+                    .map(img -> new LlmModel.ImageContent(img.base64Data(), img.mimeType()))
+                    .toList();
+        }
+
+        return model.chatStreamWithImages(conversationId, message, imageContents,
+                systemPrompt, availableTools, config);
     }
 
     @Override

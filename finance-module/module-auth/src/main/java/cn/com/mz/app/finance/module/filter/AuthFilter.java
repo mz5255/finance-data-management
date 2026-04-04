@@ -26,8 +26,7 @@ public class AuthFilter implements Filter {
             "/v3/api-docs",
             "/api/finance-data/auth/login",
             "/api/finance-data/auth/register",
-            "/api/finance-data/auth/captchaImage",
-            "/api/finance-data/auth/validate"
+            "/api/finance-data/auth/captchaImage"
     );
 
     @Override

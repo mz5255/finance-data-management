@@ -51,6 +51,30 @@ public interface LlmModel {
                                    List<String> availableTools, AiModuleConfig config);
 
     /**
+     * 执行多模态对话（流式，支持图片）
+     *
+     * @param conversationId 会话ID
+     * @param message        用户消息
+     * @param images         图片列表（base64编码）
+     * @param systemPrompt   系统提示词
+     * @param availableTools 可用工具
+     * @param config         配置
+     * @return 响应流
+     */
+    default Flux<ChatResponse> chatStreamWithImages(String conversationId, String message,
+                                                    List<ImageContent> images, String systemPrompt,
+                                                    List<String> availableTools, AiModuleConfig config) {
+        // 默认实现：忽略图片，使用普通文本对话
+        return chatStream(conversationId, message, systemPrompt, availableTools, config);
+    }
+
+    /**
+     * 图片内容
+     */
+    record ImageContent(String base64Data, String mimeType) {
+    }
+
+    /**
      * 生成嵌入向量
      * @param text 文本内容
      * @return 向量数组

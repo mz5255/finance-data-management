@@ -2,6 +2,7 @@ package cn.com.mz.app.finance.ai.agent;
 
 import cn.com.mz.app.finance.ai.dto.response.ChatResponse;
 import cn.com.mz.app.finance.ai.module.AiModuleConfig;
+import cn.com.mz.app.finance.ai.service.file.AiFileProcessService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -44,6 +45,16 @@ public abstract class BaseAgent implements Agent {
     public Flux<ChatResponse> chatStream(String conversationId, String message) {
         log.info("Agent [{}] streaming message for conversation: {}", type, conversationId);
         // 子类实现具体逻辑
+        return doChatStream(conversationId, message);
+    }
+
+    @Override
+    public Flux<ChatResponse> chatStreamWithImages(String conversationId, String message,
+                                                   List<AiFileProcessService.ImageData> images) {
+        log.info("Agent [{}] streaming message with {} images for conversation: {}",
+                type, images != null ? images.size() : 0, conversationId);
+        // 默认实现：忽略图片，调用普通文本对话
+        // 子类可以重写此方法以支持多模态
         return doChatStream(conversationId, message);
     }
 

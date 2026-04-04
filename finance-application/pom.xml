@@ -39,6 +39,12 @@
             <artifactId>module-user</artifactId>
             <version>1.0-RELEASE</version>
         </dependency>
+        <!-- AI Agent 模块 -->
+        <dependency>
+            <groupId>cn.com.mz.app.finance.module.ai</groupId>
+            <artifactId>module-ai-agent</artifactId>
+            <version>1.0-RELEASE</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

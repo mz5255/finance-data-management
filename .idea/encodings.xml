@@ -4,10 +4,12 @@
     <file url="file://$PROJECT_DIR$/finance-application/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-datasource/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/finance-module/module-ai-agent/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/module-auth/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/module-finance/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/module-system/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/module-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/finance-module/module-web-spider/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-module/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/finance-starter/cache-starter/src/main/java" charset="UTF-8" />

@@ -34,6 +34,25 @@ ai:
       # 请求失败后的重试次数
       retry-times: 3
 
+    # 智谱 GLM 视觉模型配置（支持图片分析）
+    zhipu-vision:
+      # 是否启用该模型
+      enabled: true
+      # API 密钥
+      api-key: 720078d070634df08e25c57acb005887.RguGPV6tCxt4Mmku
+      # 使用的具体模型名称（GLM-4V-Plus 支持 base64 编码）
+      model: glm-4v-plus
+      # API 服务地址
+      base-url: https://open.bigmodel.cn/api/paas/v4
+      # 最大输出 Token 数量
+      max-tokens: 4096
+      # 温度参数
+      temperature: 0.7
+      # 请求超时时间（毫秒）
+      timeout: 60000
+      # 请求失败后的重试次数
+      retry-times: 3
+
     # Claude 模型配置（可选，默认禁用）
     claude:
       # 是否启用该模型

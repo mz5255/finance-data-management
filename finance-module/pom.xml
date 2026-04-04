@@ -16,6 +16,8 @@
         <module>module-user</module>
         <module>module-system</module>
         <module>module-finance</module>
+        <module>module-web-spider</module>
+        <module>module-ai-agent</module>
     </modules>
 
     <properties>

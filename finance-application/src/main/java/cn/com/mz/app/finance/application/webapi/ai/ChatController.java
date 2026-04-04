@@ -4,6 +4,7 @@ import cn.com.mz.app.finance.ai.agent.Agent;
 import cn.com.mz.app.finance.ai.agent.AgentFactory;
 import cn.com.mz.app.finance.ai.dto.request.ChatRequest;
 import cn.com.mz.app.finance.ai.dto.response.ChatResponse;
+import cn.com.mz.app.finance.ai.module.AiModuleConfig;
 import cn.com.mz.app.finance.ai.service.ConversationService;
 import cn.com.mz.app.finance.ai.service.file.AiFileProcessService;
 import cn.com.mz.app.finance.common.dto.base.BaseResult;
@@ -57,7 +58,7 @@ public class ChatController {
     }
 
     @PostMapping(value = "/chat/with-files", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @Operation(summary = "带文件的流式对话", description = "上传文件并发送消息，AI 分析文件内容")
+    @Operation(summary = "带文件的流式对话", description = "上传文件并发送消息，AI 分析文件内容（支持图片）")
     public Flux<ChatResponse> chatWithFiles(
             @RequestParam("message") String message,
             @RequestParam(value = "conversationId", required = false) String conversationId,
@@ -70,25 +71,23 @@ public class ChatController {
         try {
             // 处理文件
             String fileContent = "";
+            List<AiFileProcessService.ImageData> images = null;
             List<String> fileNames = null;
 
             if (files != null && files.length > 0) {
                 AiFileProcessService.FileProcessResult result = fileProcessService.processFiles(files);
                 fileContent = result.textContent();
+                images = result.images();
 
                 // 提取文件名
                 fileNames = java.util.Arrays.stream(files)
                         .map(MultipartFile::getOriginalFilename)
                         .collect(Collectors.toList());
 
-                // 如果有图片，暂时只提示（Vision 功能待实现）
-                if (!result.images().isEmpty()) {
-                    fileContent += "\n\n[检测到图片文件，图片分析功能开发中...]";
-                    log.info("Images detected: {}", result.images().size());
-                }
+                log.info("Files processed - text length: {}, images: {}", fileContent.length(), images.size());
             }
 
-            // 合并消息
+            // 构建完整消息
             String fullMessage;
             if (!fileContent.isEmpty()) {
                 fullMessage = message + "\n\n--- 上传的文件内容 ---" + fileContent;
@@ -106,13 +105,41 @@ public class ChatController {
             }
             conversationService.addMessage(convId, "USER", userMessageToSave);
 
-            // 调用 Agent
-            Agent agent = agentFactory.createByType(agentType);
+            // 获取 Agent - 如果有图片，使用视觉模型
+            Agent agent;
+            if (images != null && !images.isEmpty()) {
+                // 有图片，创建使用视觉模型的 Agent
+                log.info("Creating agent with vision model for {} images", images.size());
+                AiModuleConfig visionConfig = AiModuleConfig.builder()
+                        .type(agentType)
+                        .modelId("zhipu-vision")
+                        .maxContextRounds(20)
+                        .temperature(0.7)
+                        .maxTokens(4096)
+                        .timeout(60000)
+                        .streamEnabled(true)
+                        .build();
+                agent = agentFactory.create(visionConfig);
+            } else {
+                // 纯文本，使用默认 Agent
+                agent = agentFactory.createByType(agentType);
+            }
 
             // 用于累积 AI 回复
             AtomicReference<StringBuilder> contentAccumulator = new AtomicReference<>(new StringBuilder());
 
-            return agent.chatStream(convId, fullMessage)
+            // 根据是否有图片选择不同的调用方式
+            Flux<ChatResponse> responseFlux;
+            if (images != null && !images.isEmpty()) {
+                // 有图片，使用多模态调用
+                log.info("Using multimodal chat with {} images", images.size());
+                responseFlux = agent.chatStreamWithImages(convId, fullMessage, images);
+            } else {
+                // 纯文本
+                responseFlux = agent.chatStream(convId, fullMessage);
+            }
+
+            return responseFlux
                     .doOnNext(response -> {
                         if (response.getContent() != null) {
                             contentAccumulator.get().append(response.getContent());

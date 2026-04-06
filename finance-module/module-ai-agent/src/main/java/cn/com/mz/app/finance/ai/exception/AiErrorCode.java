@@ -1,5 +1,6 @@
 package cn.com.mz.app.finance.ai.exception;
 
+
 import lombok.Getter;
 
 /**

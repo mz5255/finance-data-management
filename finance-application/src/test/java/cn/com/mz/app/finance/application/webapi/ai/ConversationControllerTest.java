@@ -1,6 +1,5 @@
 package cn.com.mz.app.finance.application.webapi.ai;
 
-import cn.com.mz.app.finance.ai.dto.request.ConversationCreateRequest;
 import cn.com.mz.app.finance.ai.dto.response.ConversationResponse;
 import cn.com.mz.app.finance.ai.dto.response.MessageHistoryResponse;
 import cn.com.mz.app.finance.ai.service.ConversationService;
